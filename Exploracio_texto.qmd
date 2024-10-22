@@ -1,0 +1,247 @@
+---
+title: "Trabajo exploratorio sobre el texto en los tuits"
+subtitle: 'Hallazgos en torno al uso del #Presirvienta en "X"'
+author: "Juan Carlos Baena Silva"
+format: html
+toc: true
+number-sections: true
+---
+
+```{r librerias}
+library(stringr)
+library(tidyverse)
+library(tidytext)
+library(tm)
+library(lubridate)
+library(hrbrthemes)
+library(wordcloud2)
+
+```
+
+# Trabajo exploratorio y análisis del texto en los tuits sobre el #Presirvienta
+
+## Primeros pasos
+
+Cargamos los datos:
+
+```{r dataframe}
+tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
+# Se escogen solo las columnas que van a servirnos
+
+tidy_presirvienta1 <- tidy_presirvienta1 %>% 
+  select(id, timestamp, author, body, Emotion)
+
+# Convertir a formato de fecha
+tidy_presirvienta1$timestamp <- ymd_hms(tidy_presirvienta1$timestamp)
+
+# Filtrar las entradas entre el 1 de octubre y el 8 de octubre
+
+# Definir el rango de fechas
+start_date <- ymd("2024-10-01")
+end_date <- ymd("2024-10-08")
+
+# Filtrar las filas dentro del rango de fechas
+tidy_presirvienta1 <- tidy_presirvienta1 %>%
+  filter(timestamp >= start_date & timestamp <= end_date)
+
+```
+
+
+## Limpieza del texto
+
+```{r limpieza}
+
+limp_presirvienta <- tidy_presirvienta1 %>%
+  select(timestamp, author, body, Emotion) %>%
+  mutate(body = str_replace_all(body, '(http|https)[^([:blank:]|\\"|<|&|#\n\r)]+', "")) %>%
+  mutate(body = str_replace_all(body, "@\\S+", "")) %>%
+  unnest_tokens(word, body) %>%
+  anti_join(tibble(word = tm::stopwords("es")))
+  
+```
+
+
+## Conteo de palabras
+
+```{r conteo}
+#conteo de ocurrencias por palabras gral.
+conteogral_presirvienta <- limp_presirvienta %>% 
+  count(`word`, sort = TRUE)
+#conteo de palabras por día
+conteodia_presirvienta <- limp_presirvienta %>% 
+  mutate(date = as_date(timestamp)) %>%
+  group_by(date) %>%
+  count(word, sort = TRUE)
+
+#conteo de palabras por emoción del tuit
+
+conteoemocion_presirvienta <- limp_presirvienta %>% 
+  group_by(Emotion) %>% 
+  count(word, sort=TRUE)
+
+```
+
+
+## Nube de palabras y gráficos
+
+### Gráfica de barras palabras más repetidas con mas de 20 ocurrencias
+```{r barras1}
+
+conteogral_presirvienta %>% 
+  filter(!word == 'presirvienta') %>% 
+  filter(n > 19) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  labs(y = NULL, x = 'conteo',
+       title = 'Palabras con ocurrencia mayor a 20')+
+  theme(legend.position = "none")+
+  theme_ft_rc()
+
+```
+
+### Gráfica de barras de palabras repetidas por día
+
+```{r conteodia}
+conteodia_presirvienta %>% 
+  filter(!word == 'presirvienta') %>%
+  filter(n>5) %>% 
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  facet_wrap(~ date, scales = "free") +
+  labs(y = NULL, x = 'conteo',
+       title = 'Palabras con más ocurrencias por día')+
+  theme(legend.position = "none", date_labels = "%d/%m/%Y")+
+  theme_ft_rc() 
+  
+
+```
+
+
+### Gráfica de barras por emoción
+
+```{r grafica emoción}
+conteoemocion_presirvienta%>% 
+  filter(!word == 'presirvienta') %>%
+  filter(n>5) %>% 
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  facet_wrap(~ Emotion, scales = "free") +
+  labs(y = NULL, x = 'conteo',
+       title = 'Palabras con más ocurrencias por Emoción')+
+  theme(legend.position = "none")+
+  theme_ft_rc() 
+```
+
+
+### Nube de palabras
+
+```{r wordcloud}
+
+conteogral_presirvienta1 <-  conteogral_presirvienta %>% 
+  filter(!word == "presirvienta") 
+
+wordcloud2(conteogral_presirvienta1, color = 'random-light'  , backgroundColor = ft_cols$slate)
+
+```
+
+## Bigramas
+Creación de base de datos con los bigramas
+```{r bigramas}
+
+bigram_presirvienta <- tidy_presirvienta1 %>%
+  select(timestamp, author, body, Emotion) %>%
+  mutate(body = str_replace_all(body, '(http|https)[^([:blank:]|\\"|<|&|#\n\r)]+', "")) %>%
+  mutate(body = str_replace_all(body, "@\\S+", "")) %>%
+  unnest_tokens(bigram, body, token = "ngrams", n = 2) %>% 
+  separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  anti_join(tibble(word1 = tm::stopwords("es"))) %>% 
+  anti_join(tibble(word2 = tm::stopwords("es"))) %>%
+  unite(bigram, word1, word2, sep = " ")
+
+```
+
+Creación de conteos general, por día y por emoción
+```{r conteosbigramas}
+#conteo de ocurrencias por palabras gral.
+conteobigramas_presirvienta <- bigram_presirvienta %>% 
+  count(bigram, sort = TRUE) %>% 
+  filter(!bigram == 'NA NA') %>% 
+  filter(!bigram == 'presirvienta presirvienta')
+#conteo de palabras por día
+bigramdia_presirvienta <- bigram_presirvienta %>% 
+  mutate(date = as_date(timestamp)) %>%
+  group_by(date) %>%
+  count(bigram, sort = TRUE) %>% 
+  filter(!bigram == 'NA NA') %>% 
+  filter(!bigram == 'presirvienta presirvienta')
+
+#conteo de palabras por emoción del tuit
+
+bigramemocion_presirvienta <- bigram_presirvienta %>% 
+  group_by(Emotion) %>% 
+  count(bigram, sort=TRUE) %>% 
+  filter(!bigram == 'NA NA') %>% 
+  filter(!bigram == 'presirvienta presirvienta')
+```
+
+### Gráficas bigramas
+
+```{r graficas_bigramas}
+
+conteobigramas_presirvienta %>% 
+  filter(n > 6) %>%
+  mutate(bigram = reorder(bigram, n)) %>%
+  ggplot(aes(n, bigram)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  labs(y = NULL, x = 'conteo',
+       title = 'Bigramas con ocurrencia mayor a 6')+
+  theme(legend.position = "none")+
+  theme_ft_rc()
+```
+
+
+Grafica por día
+
+```{r bigrama_dia}
+bigramdia_presirvienta %>%
+  filter(n>3) %>% 
+  mutate(bigram = reorder(bigram, n)) %>%
+  ggplot(aes(n, bigram)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  facet_wrap(~ date, scales = "free") +
+  labs(y = NULL, x = 'conteo',
+       title = 'Bigramas con más ocurrencias por día')+
+  theme(legend.position = "none", date_labels = "%d/%m/%Y")+
+  theme_ft_rc() 
+```
+
+
+Gráfica por emocion
+
+```{r bigrama_emocion}
+
+bigramemocion_presirvienta%>%
+  filter(n>3) %>% 
+  mutate(bigram = reorder(bigram, n)) %>%
+  ggplot(aes(n, bigram)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  facet_wrap(~ Emotion, scales = "free") +
+  labs(y = NULL, x = 'conteo',
+       title = 'Palabras con más ocurrencias por Emoción')+
+  theme(legend.position = "none")+
+  theme_ft_rc() 
+
+
+```
+
+
+### Nube de palabras bigrama
+
+```{r nube de palabras}
+
+wordcloud2(conteobigramas_presirvienta, color = 'random-light'  , backgroundColor = ft_cols$slate)
+```
+

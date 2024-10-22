@@ -1,0 +1,109 @@
+---
+title: "Matriz de correlación"
+author: "Juan Baena"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+library(ggthemes)
+library(hrbrthemes)
+library(scales)
+library(ftExtra)
+```
+
+# Matriz de correlación
+
+El primer paso es cargar el dataframe y convertir en fechas la columna timestamp, además se convierten en factores las columnas que tienen categorías.
+```{r dataframe}
+
+tidy_presirvienta <- read.csv('data/tidy_presirvienta.csv')
+
+#Convertir a formato de fecha
+
+tidy_presirvienta$timestamp <- ymd_hms(tidy_presirvienta$timestamp)
+
+# Convertir a factores
+convertir_fact <- c('author', 'source', 'is_retweet',	'retweeted_user',	'is_quote_tweet',	'quoted_user',	'is_quote_withheld',	'is_reply',	'replied_user',	'is_withheld', 'Emotion')
+
+tidy_presirvienta[convertir_fact] <- lapply(tidy_presirvienta[convertir_fact], as.factor)
+
+# Filtrar las entradas entre el 1 de octubre y el 8 de octubre
+
+# Definir el rango de fechas
+start_date <- ymd("2024-10-01")
+end_date <- ymd("2024-10-08")
+
+# Filtrar las filas dentro del rango de fechas
+tidy_presirvienta <- tidy_presirvienta %>%
+  filter(timestamp >= start_date & timestamp <= end_date)
+```
+
+Segundo paso, se crea una nueva dataframe con los datos que pueden ser incluidos en un plot.
+
+```{r df numerico}
+interacciones_presirvienta <- tidy_presirvienta %>% 
+  select(id, author, source, hashtags, mentions , retweet_count, reply_count, like_count, quote_count, impression_count, is_reply, sentiment)
+```
+
+
+## Plot de todas las variables categóricas y numéricas
+
+```{r}
+plot(interacciones_presirvienta)
+```
+## Matriz de correlación
+
+Revisando los resultados anteriores, parece interesante hacer una matriz de correlaciones para establecer qué variables tienen mayor correlación.
+Se escogen solamente algunas variables; retweet_count; reply_count; like_count; quote_count; impression_count; y sentiment.
+
+```{r corm}
+corm <-
+  tidy_presirvienta |>
+  dplyr::select(retweet_count, reply_count, like_count, quote_count, impression_count, sentiment) |>
+  corrr::correlate(diagonal = 1) |>
+  corrr::shave(upper = FALSE)
+
+corm <- corm |>
+  tidyr::pivot_longer(
+    cols = -term,
+    names_to = "colname",
+    values_to = "corr"
+  ) |>
+  dplyr::mutate(
+    rowname = forcats::fct_inorder(term),
+    colname = forcats::fct_inorder(colname),
+    label = dplyr::if_else(is.na(corr), "", sprintf("%1.2f", corr))
+  )
+```
+
+
+```{r}
+library(ggsci)
+ggplot(corm, aes(rowname, fct_rev(colname), fill = corr)) +
+  geom_tile() +
+  geom_text(aes(
+    label = label,
+    color = abs(corr) < .75
+  )) +
+  coord_fixed(expand = FALSE) +
+  scale_color_manual(
+    values = c("white", "black"),
+    guide = "none"
+  ) +
+  scale_fill_distiller(
+    palette = "PuOr", na.value = "white",
+    direction = 1, limits = c(-1, 1),
+    name = "Pearson\nCorrelation:"
+  )  +
+  labs(x = NULL, y = NULL, 
+       title= 'Matriz de correlación') +
+  theme(panel.border = element_rect(color = NA, fill = NA),
+        legend.position = c(.85, .8))
+```
+
