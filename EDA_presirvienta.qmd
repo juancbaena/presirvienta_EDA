@@ -60,9 +60,7 @@ summary(tidy_presirvienta)
 
 #### Histograma de publicaciones
 
-```{r Hist dia}
-
-
+```{r Hist dia}waring
 tidy_presirvienta %>% 
   mutate(day = as.Date(timestamp)) %>%  # Convertimos 'timestamp' a tipo Date
   ggplot(aes(x = day)) +
