@@ -14,10 +14,10 @@ library(ggthemes)
 library(hrbrthemes)
 library(scales)
 library(ggsci)
-library(stargazer)
+
 ```
 
-# Análisis Exploratorio de Datos sobre las publicaciones usando el término "Presirvienta" en la red social "X"
+# Análisis Exploratorio de Datos sobre las publicaciones que usa el término "Presirvienta" en la red social "X"
 
 ## Introducción
 
@@ -49,11 +49,586 @@ tidy_presirvienta <- tidy_presirvienta %>%
 
 La base de datos resultado del proceso de recopilación y limpieza se puede resumir de la siguiente manera:
 
-```{r summary, echo=FALSE}
-library(psych)
-describe(tidy_presirvienta[, c("retweet_count", "reply_count", "like_count","quote_count", "impression_count", "Word.count", "sentiment")])
-```
+La metodología que se siguió para esta investigación consistió en:
+
+1. Recopilación de datos en la red social X, empleando una búsqueda entre los días 1 de octubre y 8 de octubre de todos los tuits en los que apareciera la palabra Presirvienta.
+
+2. Para el registro de la busqueda y construcción de la base de datos se empleó primero el plugin de Firefox, [zeeschuimer](https://github.com/digitalmethodsinitiative/zeeschuimer) y posteriormente se importa la base de datos en [4Cat](https://4cat.nl/), se exportó la base de datos al formato estándar, csv (comma separated value).
+
+Los datos y los códigos empleados se encuentra en el repositorio: [https://github.com/juancbaena/presirvienta_EDA](https://github.com/juancbaena/presirvienta_EDA)
 
 ## Resultados
+
+### Resumen de los datos 
+```{r summary, echo=FALSE}
+library(stargazer)
+
+datosdf <- tidy_presirvienta %>% 
+  select(retweet_count, reply_count, like_count, quote_count, impression_count, Word.count, sentiment)
+
+stargazer(datosdf,
+digits=2,
+title="Descripción de los datos numéricos",
+type = "text")
+
+
+```
+
+Esta tabla muestra un resumen estadístico de los datos recopilados.
+
+#### Histograma de publicaciones
+
+```{r Hist dia, echo=FALSE}
+tidy_presirvienta %>% 
+  mutate(day = as.Date(timestamp)) %>%  # Convertimos 'timestamp' a tipo Date
+  ggplot(aes(x = day)) +
+  geom_bar(fill = ft_cols$red , colour = ft_cols$slate) +
+  scale_x_date(date_labels = "%d/%m/%Y", date_breaks = "1 day") +
+  labs(x = "Día", y = "Cantidad", title = "Histograma de entradas por día", subtitle = "Publicaciones entre el 1 de octubre al 8 de octubre") +
+  theme_ft_rc() 
+
+```
+
+## Análisis de publicaciones
+
+### Pay de is retweet
+
+```{r isretweet1}
+# Crear el dataframe con el conteo de "is_reply"
+conteo_is_retweet <- table(tidy_presirvienta$is_retweet)
+conteoretw <- as.data.frame(conteo_is_retweet)
+
+# Renombrar las columnas para ggplot
+colnames(conteoretw) <- c("is_retweet", "count")
+
+# Crear el gráfico de pastel
+ggplot(conteoretw, aes(x = "", y = count, fill = is_retweet)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  labs(title = "Distribución de Tweets si son retweet") +
+  scale_fill_manual(values = c("yes" = ft_cols$red , "no" = ft_cols$slate)) + 
+  theme_ft_rc(base_size = 15) +
+  geom_text(aes(label = paste0(count, " (", round(count / sum(count) * 100), "%)")),
+            position = position_stack(vjust = 0.5)) # Añadir etiquetas con porcentajes
+```
+
+### is quote
+
+```{r is_quote}
+    # Crear el dataframe con el conteo de "is_reply"
+    conteo_is_quote <- table(tidy_presirvienta$is_quote_tweet)
+    conteoquot <- as.data.frame(conteo_is_quote)
+
+    # Renombrar las columnas para ggplot
+    colnames(conteoquot) <- c("is_quote_tweet", "count")
+
+    # Crear el gráfico de pastel
+    ggplot(conteoquot, aes(x = "", y = count, fill = is_quote_tweet)) +
+      geom_bar(stat = "identity", width = 1) +
+      coord_polar("y") +
+      labs(title = "Distribución de Tweets si son cita") +
+      theme_ft_rc(base_size = 15) +
+      scale_fill_manual(values = c("yes" = ft_cols$red , "no" = ft_cols$slate)) + # Colores personalizados
+      geom_text(aes(label = paste0(count, " (", round(count / sum(count) * 100), "%)")),
+                position = position_stack(vjust = 0.5)) # Añadir etiquetas con porcentajes
+```
+
+### is reply
+
+```{r reply}
+# Crear el dataframe con el conteo de "is_reply"
+conteo_is_reply <- table(tidy_presirvienta$is_reply)
+conteorep <- as.data.frame(conteo_is_reply)
+
+# Renombrar las columnas para ggplot
+colnames(conteorep) <- c("is_reply", "count")
+
+# Crear el gráfico de pastel
+ggplot(conteorep, aes(x = "", y = count, fill = is_reply)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  labs(title = "Distribución de Tweets respuesta") +
+  theme_ft_rc(base_size = 15) +
+  scale_fill_manual(values = c("yes" = ft_cols$red , "no" = ft_cols$slate)) + 
+  geom_text(aes(label = paste0(count, " (", round(count / sum(count) * 100), "%)")),
+            position = position_stack(vjust = 0.5)) # Añadir etiquetas con porcentajes
+
+
+```
+
+## Caractéristicas principales de las publicaciones
+
+```{r nva_dataframe}
+# Nueva dataframe para manejar menos datos
+
+interacciones_presirvienta <- tidy_presirvienta %>% 
+  select(id, author, source, hashtags, mentions , retweet_count, reply_count, like_count, quote_count, impression_count, is_reply, sentiment)
+
+
+
+
+```
+
+### Conteo de autores
+
+```{r autores}
+
+interacciones_presirvienta %>% 
+  select(author) %>% 
+  group_by(author) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  filter(count > 4) %>% 
+  ggplot(aes(x = reorder(author, -count), y = count)) +
+    geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+    labs(title = "Frecuencia de autores", x = "Autores", y = "Conteo") +
+    theme_ft_rc() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+
+```
+
+### Conteo de menciones
+
+```{r menciones}
+
+interacciones_presirvienta %>% 
+  select(mentions) %>%
+  drop_na() %>% 
+  group_by(mentions) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  filter(count > 3) %>% 
+  ggplot(aes(x = reorder(mentions, -count), y = count)) +
+    geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+    labs(title = "Frecuencia de menciones", x = "Menciones", y = "Conteo") +
+    theme_ft_rc() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+
+```
+
+### Conteo de Hashtags
+
+```{r hashtags1}
+interacciones_presirvienta %>%   
+  select(hashtags) %>%
+  mutate(hashtags = strsplit(as.character(hashtags), ",")) %>% 
+  unnest(hashtags) %>% 
+  drop_na() %>% 
+  group_by(hashtags) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  filter(count > 5) %>% 
+  ggplot(aes(x = reorder(hashtags, -count), y = count)) +
+  geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+  labs(title = "Frecuencia de Hashtags", x = "Hashtags", y = "Conteo") +
+  theme_ft_rc() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+El mismo gráfico quitando #Presirvienta
+
+```{r hashtags2}
+interacciones_presirvienta %>%   
+  select(hashtags) %>%
+  mutate(hashtags = strsplit(as.character(hashtags), ",")) %>% 
+  unnest(hashtags) %>% 
+  drop_na() %>% 
+  group_by(hashtags) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  filter(count > 5) %>%
+  filter(count < 100) %>% 
+  ggplot(aes(x = reorder(hashtags, -count), y = count)) +
+  geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+  labs(title = "Frecuencia de Hashtags sin #Presirvienta", x = "Hashtags", y = "Conteo") +
+  theme_ft_rc() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Conteo de orígenes
+
+```{r orígenes}
+
+interacciones_presirvienta %>% 
+  select(source) %>%
+  drop_na() %>% 
+  group_by(source) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  filter(count > 3) %>% 
+  ggplot(aes(x = reorder(source, -count), y = count)) +
+    geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+    labs(title = "Frecuencia de orígenes", x = "Orígenes", y = "Conteo") +
+    theme_ft_rc() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+```
+
+### Conteo de autor con más respuestas
+
+```{r Conteo respuestas}
+
+tidy_presirvienta %>% 
+  select(replied_user) %>%
+  drop_na() %>% 
+  group_by(replied_user) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  filter(count > 3) %>% 
+  ggplot(aes(x = reorder(replied_user, -count), y = count)) +
+    geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+    labs(title = "Frecuencia de autor con más respuestas", 
+         x = "Autores", 
+         y = "Conteo de respuestas") +
+    theme_ft_rc() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+### Conteo de autores más retuiteados
+
+```{r masretuiteado}
+
+tidy_presirvienta %>% 
+  select(retweeted_user) %>%
+  drop_na() %>% 
+  group_by(retweeted_user) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  ggplot(aes(x = reorder(retweeted_user, -count), y = count)) +
+    geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+    labs(title = "Frecuencia de autor más retuiteado", 
+         x = "Autores", 
+         y = "Conteo de retuits") +
+    theme_ft_rc() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+### Conteo de autores más citados
+
+```{r máscitado}
+
+tidy_presirvienta %>% 
+  select(quoted_user) %>%
+  drop_na() %>% 
+  group_by(quoted_user) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  filter(count > 2) %>% 
+  ggplot(aes(x = reorder(quoted_user, -count), y = count)) +
+    geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
+    labs(title = "Frecuencia de autor más citado", 
+         x = 'Autores', 
+         y = "Conteo de citaciones") +
+    theme_ft_rc() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+### Conteo de sentimientos
+
+```{r conteo sentimientos}
+tidy_presirvienta%>% 
+  ggplot(aes(x = sentiment, color = Emotion, fill = Emotion)) +
+  geom_histogram() +
+  stat_bin(binwidth  = 10)+
+  theme_ft_rc() + 
+  labs(x= 'Sentimientos', y= 'Conteo',
+       title = 'Histograma de sentimientos',
+       subtitle = 'Escala de -50 a +50') +
+  scale_color_ucscgb()
+```
+
+## Interacciones
+
+### Likes
+
+```{r Likes}
+tidy_presirvienta %>% 
+  filter(like_count<1000) %>% 
+  ggplot(aes( x= Emotion, y= like_count, color = Emotion )) +
+    geom_jitter() +
+    labs(x = "Emoción", y = "Número de Likes",
+         title = 'Número de Likes por Emoción',
+         subtitle = 'Likes menores a 1000',
+         caption = 'Se filtraron para mejorar la visualización'
+         ) +
+    coord_flip() +
+    theme_ft_rc() +
+    scale_color_ucscgb()+
+    theme(legend.position = "none")
+
+
+```
+
+```{r violin like}
+tidy_presirvienta %>% 
+  filter(like_count >200) %>% 
+  ggplot(aes(x = 1, y = like_count)) +
+    geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
+    labs(x = NULL,
+         y = "Número de Likes",
+         title = 'Gráfico de violín de likes',
+         subtitle = 'Likes mayores a 200'
+    ) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    coord_flip() +
+    theme_ft_rc()
+```
+
+### Retweets
+
+```{r retweets}
+
+tidy_presirvienta %>% 
+  filter(retweet_count < 1000) %>% 
+  ggplot(aes( x= Emotion, y= retweet_count, color = Emotion )) +
+    geom_jitter(width = .3, alpha = .5) +
+    labs(x = "Emoción", y = "Número de Likes",
+         title = 'Número de Retuits por Emoción',
+         subtitle = 'Retuits menores a 1000',
+         caption = 'Se filtraron para mejorar la visualización'
+         ) +
+    coord_flip() +
+    theme_ft_rc() +
+    scale_color_ucscgb()+
+    theme(legend.position = "none")
+
+```
+
+```{r rtviolin}
+tidy_presirvienta %>% 
+  filter(retweet_count >100) %>% 
+  ggplot(aes(x = 1, y = retweet_count)) +
+    geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
+    labs(x = NULL,
+         y = "Número de Likes",
+         title = 'Gráfico de violín de retuits',
+         subtitle = 'Retuits mayores a 100'
+    ) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    coord_flip() +
+    theme_ft_rc()
+```
+
+### Respuestas
+
+```{r respuestas}
+
+tidy_presirvienta %>% 
+  filter(reply_count <200) %>% 
+  ggplot(aes( x= Emotion, y= reply_count, color = Emotion )) +
+    geom_jitter(width = .3, alpha = .5) +
+    labs(x = "Emoción", y = "Número de Respuestas",
+         title = 'Número de Respuestas por Emoción',
+         subtitle = 'Respuestas menores a 200',
+         caption = 'Se filtraron para mejorar la visualización'
+         ) +
+    coord_flip() +
+    theme_ft_rc() +
+    scale_color_ucscgb()+
+    theme(legend.position = "none")
+```
+
+```{r repviolin}
+tidy_presirvienta %>% 
+  filter(reply_count > 50) %>% 
+  ggplot(aes(x = 1, y = reply_count)) +
+    geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
+    labs(x = NULL,
+         y = "Número de Respuestas",
+         title = 'Gráfico de violín de respuestas',
+         subtitle = 'Retuits mayores a 50'
+    ) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    coord_flip() +
+    theme_ft_rc()
+```
+
+### Citaciones
+
+```{r citaciones}
+
+tidy_presirvienta %>% 
+  filter(quote_count < 100) %>% 
+  ggplot(aes( x= Emotion, y= quote_count, color = Emotion )) +
+    geom_jitter(width = .3, alpha = .5) +
+    labs(x = "Emoción", y = "Número de Citación",
+         title = 'Número de Citación por Emoción',
+         subtitle = 'Citación menores a 100',
+         caption = 'Se filtraron para mejorar la visualización'
+         ) +
+    coord_flip() +
+    theme_ft_rc() +
+    scale_color_ucscgb()+
+    theme(legend.position = "none")
+
+
+```
+
+```{r quoteviolin}
+tidy_presirvienta %>% 
+  filter(quote_count > 50) %>% 
+  ggplot(aes(x = 1, y = quote_count)) +
+    geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
+    labs(x = NULL,
+         y = "Número de Citas",
+         title = 'Gráfico de violín de Citas',
+         subtitle = 'Citas mayores a 50'
+    ) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    coord_flip() +
+    theme_ft_rc()
+```
+
+### Impresiones
+
+```{r impresiones}
+
+library(scales)
+
+tidy_presirvienta %>% 
+  # Filtrar valores no finitos
+  filter(is.finite(impression_count)) %>%
+  filter(impression_count<100000) %>% 
+  ggplot(aes(x = Emotion, y = impression_count, color = Emotion)) +
+    geom_jitter(width = .3, alpha = .5) +
+    labs(x = "Emoción", y = "Número de Impresiones",
+         title = 'Número de Impresiones por Emoción',
+         subtitle = 'Impresiones menores a 100,000',
+         caption = 'Se filtraron para mejorar la visualización'
+         ) +
+    coord_flip() +
+    theme_ft_rc() +
+    scale_color_ucscgb()+
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    theme(legend.position = "none")
+
+
+```
+
+```{r}
+tidy_presirvienta %>% 
+  filter(impression_count > 10000) %>% 
+  ggplot(aes(x = 1, y = impression_count)) +
+    geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
+    labs(x = NULL,
+         y = "Número de Impresiones",
+         title = 'Gráfico de violín de Impresiones',
+         subtitle = 'Citas mayores a 10,000'
+    ) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    coord_flip() +
+    theme_ft_rc()
+```
+
+### Plots sobre interacciones
+
+### Likes vs. Respuestas
+
+```{r plot1}
+
+interacciones_presirvienta %>% 
+  filter(like_count>50, reply_count > 50) %>% 
+  ggplot(aes(x = like_count, y= reply_count)) +
+  geom_smooth(method = loess, color = ft_cols$yellow, fill =  ft_cols$slate) +
+  geom_point(color = ft_cols$red) +
+  theme_ft_rc() +
+  labs(
+    x = 'Número de likes',
+    y = 'Número de respuestas',
+    title = 'Likes vs. Respuestas',
+    subtitle = 'Mayores a 50'
+  )
+
+```
+
+### Likes vs. retuits
+
+```{r plot2}
+
+interacciones_presirvienta %>% 
+  filter(like_count> 100, retweet_count > 100) %>% 
+  ggplot(aes(x = like_count, y= retweet_count)) +
+  geom_smooth(method = loess, color = ft_cols$yellow, fill =  ft_cols$slate) +
+  geom_point(color = ft_cols$red) +
+  theme_ft_rc() +
+  labs(
+    x = 'Número de likes',
+    y = 'Número de retuits',
+    title = 'Likes vs. Retuits',
+    subtitle = 'Mayores a 100'
+  )
+
+```
+
+### Likes vs. Impresiones
+
+```{r plot 3}
+
+interacciones_presirvienta %>% 
+  filter(like_count>100) %>% 
+  ggplot(aes(x = like_count, y= impression_count)) +
+  geom_smooth(method = loess, color = ft_cols$yellow, fill =  ft_cols$slate) +
+  geom_point(color = ft_cols$red) +
+  theme_ft_rc() +
+   scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))+
+  labs(
+    x = 'Número de likes',
+    y = 'Número de Impresiones',
+    title = 'Likes vs. Impresiones',
+    subtitle = 'Mayores a 100'
+  )
+
+
+```
+
+### Likes vs. Sentimientos
+
+```{r}
+library(ggsci)
+tidy_presirvienta %>% 
+  filter(like_count<200) %>% 
+  ggplot(aes(x = like_count, y= sentiment, color = Emotion)) +
+  geom_point() +
+  scale_color_ucscgb() +
+  theme_ft_rc() +
+   scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))+
+  facet_wrap( ~ is_reply)+
+  labs(
+    x = 'Número de likes',
+    y = 'Valores de sentimientos',
+    title = 'Likes vs. Sentimientos',
+    subtitle = 'Filtrado por respuesta'
+  )
+```
+
+### Likes vs. Sentimientos filtrados por cita
+
+```{r}
+tidy_presirvienta %>% 
+  filter(like_count<200) %>% 
+  ggplot(aes(x = like_count, y= sentiment, color = Emotion)) +
+  geom_point() +
+  scale_color_ucscgb() +
+  theme_ft_rc() +
+   scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))+
+  facet_wrap( ~ is_quote_tweet)+
+  labs(
+    x = 'Número de likes',
+    y = 'Valores de sentimientos',
+    title = 'Likes vs. Sentimientos',
+    subtitle = 'Filtrado por cita'
+  )
+```
+
 
 ## Conclusiones
