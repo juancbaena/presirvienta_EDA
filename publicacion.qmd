@@ -1,0 +1,59 @@
+---
+title: "Publicación Presirvienta"
+subtitle: 'Hallazgos en torno al uso del #Presirvienta en "X"'
+author: "Juan Carlos Baena"
+format: html
+toc: true
+number-sections: true
+---
+
+```{r librerías, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(ggthemes)
+library(hrbrthemes)
+library(scales)
+library(ggsci)
+library(stargazer)
+```
+
+# Análisis Exploratorio de Datos sobre las publicaciones usando el término "Presirvienta" en la red social "X"
+
+## Introducción
+
+## Metodología
+
+```{r factores, include=FALSE}
+
+tidy_presirvienta <- read.csv('data/tidy_presirvienta.csv')
+
+#Convertir a formato de fecha
+
+tidy_presirvienta$timestamp <- ymd_hms(tidy_presirvienta$timestamp)
+
+# Convertir a factores
+convertir_fact <- c('author', 'source', 'is_retweet',	'retweeted_user',	'is_quote_tweet',	'quoted_user',	'is_quote_withheld',	'is_reply',	'replied_user',	'is_withheld', 'Emotion')
+
+tidy_presirvienta[convertir_fact] <- lapply(tidy_presirvienta[convertir_fact], as.factor)
+
+# Filtrar las entradas entre el 1 de octubre y el 8 de octubre
+
+# Definir el rango de fechas
+start_date <- ymd("2024-10-01")
+end_date <- ymd("2024-10-08")
+
+# Filtrar las filas dentro del rango de fechas
+tidy_presirvienta <- tidy_presirvienta %>%
+  filter(timestamp >= start_date & timestamp <= end_date)
+```
+
+La base de datos resultado del proceso de recopilación y limpieza se puede resumir de la siguiente manera:
+
+```{r summary, echo=FALSE}
+library(psych)
+describe(tidy_presirvienta[, c("retweet_count", "reply_count", "like_count","quote_count", "impression_count", "Word.count", "sentiment")])
+```
+
+## Resultados
+
+## Conclusiones
