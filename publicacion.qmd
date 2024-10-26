@@ -56,7 +56,11 @@ La metodología que se siguió para esta investigación consistió en:
 
 2. Para el registro de la busqueda y construcción de la base de datos se empleó primero el plugin de Firefox, [zeeschuimer](https://github.com/digitalmethodsinitiative/zeeschuimer) y posteriormente se importa la base de datos en [4Cat](https://4cat.nl/), se exportó la base de datos al formato estándar, csv (comma separated value).
 
-Los datos y los códigos empleados se encuentra en el repositorio: [https://github.com/juancbaena/presirvienta_EDA](https://github.com/juancbaena/presirvienta_EDA)
+3. Posteriormente, la base de datos se importó en el programa ["Orange Machine Learning"](https://orangedatamining.com/), en este se hizo un análisis de sentimientos y emociones empleando los algoritmos que el programa tiene para trabajar con datos en español. Una vez analizados los sentimientos y emociones, se agregan esas columnas a la base de datos anterior y se exporta una ves más en formato cvs.
+
+4. En el programa Rstudio se carga la base de datos y ahí, empleando el 
+
+* Los datos y los códigos empleados se encuentra en el repositorio: [https://github.com/juancbaena/presirvienta_EDA](https://github.com/juancbaena/presirvienta_EDA)
 
 ## Resultados
 
