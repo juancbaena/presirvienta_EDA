@@ -52,19 +52,26 @@ La base de datos resultado del proceso de recopilación y limpieza se puede resu
 
 La metodología que se siguió para esta investigación consistió en:
 
-1. Recopilación de datos en la red social X, empleando una búsqueda entre los días 1 de octubre y 8 de octubre de todos los tuits en los que apareciera la palabra Presirvienta.
+1.  Recopilación de datos en la red social X, empleando una búsqueda entre los días 1 de octubre y 8 de octubre de todos los tuits en los que apareciera la palabra Presirvienta.
 
-2. Para el registro de la busqueda y construcción de la base de datos se empleó primero el plugin de Firefox, [zeeschuimer](https://github.com/digitalmethodsinitiative/zeeschuimer) y posteriormente se importa la base de datos en [4Cat](https://4cat.nl/), se exportó la base de datos al formato estándar, csv (comma separated value).
+2.  Para el registro de la busqueda y construcción de la base de datos se empleó primero el plugin de Firefox, [zeeschuimer](https://github.com/digitalmethodsinitiative/zeeschuimer) y posteriormente se importa la base de datos en [4Cat](https://4cat.nl/), se exportó la base de datos al formato estándar, csv (comma separated value).
 
-3. Posteriormente, la base de datos se importó en el programa ["Orange Machine Learning"](https://orangedatamining.com/), en este se hizo un análisis de sentimientos y emociones empleando los algoritmos que el programa tiene para trabajar con datos en español. Una vez analizados los sentimientos y emociones, se agregan esas columnas a la base de datos anterior y se exporta una ves más en formato cvs.
+3.  Posteriormente, la base de datos se importó en el programa ["Orange Machine Learning"](https://orangedatamining.com/), en este se hizo un análisis de sentimientos y emociones empleando los algoritmos que el programa tiene para trabajar con datos en español. Una vez analizados los sentimientos y emociones, se agregan esas columnas a la base de datos anterior y se exporta una ves más en formato cvs.
 
-4. En el programa Rstudio se carga la base de datos y ahí, empleando el 
+4.  En el programa Rstudio se carga la base de datos y ahí, empleando principalmente las librerías agrupadas en el ["tidyverse"](https://www.tidyverse.org/), además se sigue el proceso descrito en el libro [R for Data Science](https://r4ds.hadley.nz/): Importación; limpieza y acomodo; transformación; visualización: modelado; comunicación.
 
-* Los datos y los códigos empleados se encuentra en el repositorio: [https://github.com/juancbaena/presirvienta_EDA](https://github.com/juancbaena/presirvienta_EDA)
+![](https://es.r4ds.hadley.nz/diagrams_w_text_as_path/es/data-science.svg)
+
+La exploración de esta base de datos, la visualización de los datos, y la interpretación de los hallazgos se presentan a continuación.
+
+-   Los datos y los códigos empleados se encuentra en el repositorio: <https://github.com/juancbaena/presirvienta_EDA>
 
 ## Resultados
 
-### Resumen de los datos 
+A continuacion se presentan algunas graficas que permiten entender las publicaciones que emplearon el término presirvienta en la red social "X", del 1 de octurbre al 8 de octubre (la primera semana de la Presidenta Claudia Sheinbaum).
+
+### Resumen de los datos
+
 ```{r summary, echo=FALSE}
 
 datosdf <- tidy_presirvienta %>% 
@@ -78,9 +85,9 @@ type = "text")
 
 ```
 
-Esta tabla muestra un resumen estadístico de los datos recopilados.
+Esta tabla muestra un resumen estadístico de los datos recopilados que tienen una forma numérica, se puede observar que el total de publicaciones son 628, la publicación con más retuiteos tuvo se retuiteo alrededor de 5000 veces, el promedio de retuiteos es de 71. En el caso de respuestas el promedio es de 13 y la publicación que más tuvo, se respondió 1474 veces. En el caso de los likes, la publicación con más likes tuvo 16,168 y en promedio tuvieron 155 likes las publicaciones. En el caso de citaciones el promedio es de 2 y el máscimo es de 290. Las impresiones tienen un promedio de 4,714 y la publicación que más impresiones tuvo fue 454,838. El análisis de sentimientos y el conteo de palabras se analizará más adelante.
 
-#### Histograma de publicaciones
+### Histograma de publicaciones
 
 ```{r Hist dia, echo=FALSE}
 tidy_presirvienta %>% 
@@ -93,11 +100,11 @@ tidy_presirvienta %>%
 
 ```
 
-## Análisis de publicaciones
+En los 7 días que se analizan se puede observar que ni el primero de octubre, ni el 8 de octubre se registraron publicaciones, es importante observar que el día3 de octrubre es el día con más publicaciones, con más de 200 publicaciones ese daía, el día con menos fue el 5 de octubre, con alrededor de 70 publicaciones.
 
-### Pay de is retweet
+### Retuiteo de las publicaciones
 
-```{r isretweet1}
+```{r isretweet1, echo=FALSE}
 # Crear el dataframe con el conteo de "is_reply"
 conteo_is_retweet <- table(tidy_presirvienta$is_retweet)
 conteoretw <- as.data.frame(conteo_is_retweet)
@@ -116,9 +123,11 @@ ggplot(conteoretw, aes(x = "", y = count, fill = is_retweet)) +
             position = position_stack(vjust = 0.5)) # Añadir etiquetas con porcentajes
 ```
 
+En este gráfico puede observarse que en la base de datos solo se registró que el 1 porciento de las publicaciones son retuit, lo cual quiere decir que esta base de datos está compuesta de principalmente tuits originales.
+
 ### is quote
 
-```{r is_quote}
+```{r is_quote, echo=FALSE}
     # Crear el dataframe con el conteo de "is_reply"
     conteo_is_quote <- table(tidy_presirvienta$is_quote_tweet)
     conteoquot <- as.data.frame(conteo_is_quote)
@@ -633,6 +642,5 @@ tidy_presirvienta %>%
     subtitle = 'Filtrado por cita'
   )
 ```
-
 
 ## Conclusiones
