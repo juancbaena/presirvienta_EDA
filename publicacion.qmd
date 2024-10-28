@@ -614,7 +614,7 @@ interacciones_presirvienta %>%
 
 ### Likes vs. Impresiones
 
-```{r plot 3}
+```{r likevsimpresiones,  echo=FALSE}
 
 interacciones_presirvienta %>% 
   filter(like_count>100) %>% 
@@ -635,7 +635,7 @@ interacciones_presirvienta %>%
 
 ### Likes vs. Sentimientos
 
-```{r}
+```{r likevssentim,  echo=FALSE}
 library(ggsci)
 tidy_presirvienta %>% 
   filter(like_count<200) %>% 
@@ -655,7 +655,7 @@ tidy_presirvienta %>%
 
 ### Likes vs. Sentimientos filtrados por cita
 
-```{r}
+```{r likesvssentimcit,  echo=FALSE}
 tidy_presirvienta %>% 
   filter(like_count<200) %>% 
   ggplot(aes(x = like_count, y= sentiment, color = Emotion)) +
