@@ -272,11 +272,11 @@ interacciones_presirvienta %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-En el mismo gráfico quitando #Presirvienta, se puede observar mejor otros hashtags que aparecen en las publicaciones
+En el mismo gráfico quitando #Presirvienta, se puede observar mejor otros hashtags que aparecen en las publicaciones, los principales tienen relación con el término "Presirvienta", sin embargo, aparece el hashtag "PayadoresMx", con más de 10 menciones, que no tiene aparente relación con los principales hashtags.
 
 ### Conteo de orígenes
 
-```{r orígenes}
+```{r orígenes, echo=FALSE}
 
 interacciones_presirvienta %>% 
   select(source) %>%
@@ -294,9 +294,11 @@ interacciones_presirvienta %>%
     )
 ```
 
+En cuanto al conteo por el origén del cada tuit, se puede observar que la mayoría de las publicaciones se realiza empleando la aplicación de Android con alrededor de 300 publicaciones, seguido de la app para iphone con alrededor de 200.
+
 ### Conteo de autor con más respuestas
 
-```{r Conteo respuestas}
+```{r Conteo respuestas, echo=FALSE}
 
 tidy_presirvienta %>% 
   select(replied_user) %>%
@@ -307,7 +309,7 @@ tidy_presirvienta %>%
   filter(count > 3) %>% 
   ggplot(aes(x = reorder(replied_user, -count), y = count)) +
     geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
-    labs(title = "Frecuencia de autor con más respuestas", 
+    labs(title = "Conteo autor(a) más respuestas", 
          x = "Autores", 
          y = "Conteo de respuestas") +
     theme_ft_rc() +
@@ -315,30 +317,11 @@ tidy_presirvienta %>%
 
 ```
 
-### Conteo de autores más retuiteados
-
-```{r masretuiteado}
-
-tidy_presirvienta %>% 
-  select(retweeted_user) %>%
-  drop_na() %>% 
-  group_by(retweeted_user) %>% 
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  ggplot(aes(x = reorder(retweeted_user, -count), y = count)) +
-    geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
-    labs(title = "Frecuencia de autor más retuiteado", 
-         x = "Autores", 
-         y = "Conteo de retuits") +
-    theme_ft_rc() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-```
+Los autores que más se les ha respondido en esta base de datos es \@Melissa_Bely con 20 tuits y \@Claudiashein con 15 tuits. En tercer lugar aparece \@lopezdoriga con 10 tuits. Cabe mencionar que los tuits originales a los cuales se les respondió, no aparecen, pues en ellos no se usa el término "Presirvienta", en cambio en los que contamos aquí, sí se emplea ese término.
 
 ### Conteo de autores más citados
 
-```{r máscitado}
+```{r máscitado, echo=FALSE}
 
 tidy_presirvienta %>% 
   select(quoted_user) %>%
@@ -349,7 +332,7 @@ tidy_presirvienta %>%
   filter(count > 2) %>% 
   ggplot(aes(x = reorder(quoted_user, -count), y = count)) +
     geom_bar(stat = "identity", color = ft_cols$slate, fill = ft_cols$red) +
-    labs(title = "Frecuencia de autor más citado", 
+    labs(title = "Conteo de autor(a) más citado", 
          x = 'Autores', 
          y = "Conteo de citaciones") +
     theme_ft_rc() +
@@ -358,9 +341,11 @@ tidy_presirvienta %>%
 
 ```
 
+El perfil o autor(a), más citado es \@Melissa_Bely con 15 citaciones, y todos los dmás autores solo con cinco citaciones.
+
 ### Conteo de sentimientos
 
-```{r conteo sentimientos}
+```{r conteo sentimientos, echo=FALSE}
 tidy_presirvienta%>% 
   ggplot(aes(x = sentiment, color = Emotion, fill = Emotion)) +
   geom_histogram() +
@@ -372,11 +357,15 @@ tidy_presirvienta%>%
   scale_color_ucscgb()
 ```
 
+En el análisis de sentimientos, valorados por emociones de las publicaciones, se observa que el centro del histograma está en los sentimientos neutrales, sin embargo, existe una carga mayor de la distribución de valores hacia los sentimientos negativos, en el caso de las emociones, la alegría está por encima de todos los valores entre los valores neutrales, seguido de tristeza y sorpresa. el valor más bajo lo tiene la anticipación que no logra visualizar valores.
+
 ## Interacciones
+
+En el caso de las interacciones que los usuarios tuvieron con las publicaciones de esta base de datos, es importante mencionar que las interacciones son: *Likes*, *Retuits*, *Citaciones* e *Impresiones*.
 
 ### Likes
 
-```{r Likes}
+```{r Likes, echo=FALSE}
 tidy_presirvienta %>% 
   filter(like_count<1000) %>% 
   ggplot(aes( x= Emotion, y= like_count, color = Emotion )) +
@@ -394,7 +383,9 @@ tidy_presirvienta %>%
 
 ```
 
-```{r violin like}
+En el caso de los Likes, en la gráfica anterior, es necesario señalar que se excluyeron los tuits con más de 1000 likes para poder visualizar qué emoción tiene mayor densidad. Como puede observarse, la sorpresa es la emoción con mayor número de tuits con likes, sin embargo los tuits con mayores likes, son aquellos que expresan tristeza.
+
+```{r violin like, echo=FALSE}
 tidy_presirvienta %>% 
   filter(like_count >200) %>% 
   ggplot(aes(x = 1, y = like_count)) +
@@ -409,9 +400,11 @@ tidy_presirvienta %>%
     theme_ft_rc()
 ```
 
+En la gráfica de violín anterior, lo que podemos observar, es que la mayor densidad, es decir, la mayoría de los tuits en esta base de datos, tienen menos de 1,000 likes, y que existen algunos tuits que superan los 10,000 y los 15,000 likes. Para lograr visulizar mejor esta distribución, se filtraron los tuits con menos de 200 likes, pues no se lograban observar los tuis con más de 5,000 likes.
+
 ### Retweets
 
-```{r retweets}
+```{r retweets, echo=FALSE}
 
 tidy_presirvienta %>% 
   filter(retweet_count < 1000) %>% 
@@ -429,14 +422,16 @@ tidy_presirvienta %>%
 
 ```
 
-```{r rtviolin}
+En el caso de las interacciones de los usuarios retuiteando publicaciones, la emoción con mayor densidad sigue siendo la sorpresa, sieguida de la alegría, sin embargo, la emoción que tiene publicación con mayor número de retuiteos, es la confianza.
+
+```{r rtviolin, echo=FALSE}
 tidy_presirvienta %>% 
   filter(retweet_count >100) %>% 
   ggplot(aes(x = 1, y = retweet_count)) +
     geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
     labs(x = NULL,
-         y = "Número de Likes",
-         title = 'Gráfico de violín de retuits',
+         y = "Número de retuits",
+         title = 'Gráfico de violín de Retuits',
          subtitle = 'Retuits mayores a 100'
     ) +
     scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
@@ -444,9 +439,12 @@ tidy_presirvienta %>%
     theme_ft_rc()
 ```
 
+En la visualización anterior, se puede observar que la densidad mayor está en las publicaciones con menos de 1,000 retuits, sin embargo la densidad hacia los 5,000 retuits no se reduce de manera drástica, sino que la tendencia es estable.
+
+
 ### Respuestas
 
-```{r respuestas}
+```{r respuestas, echo=FALSE}
 
 tidy_presirvienta %>% 
   filter(reply_count <200) %>% 
