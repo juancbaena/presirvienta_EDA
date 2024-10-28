@@ -441,7 +441,6 @@ tidy_presirvienta %>%
 
 En la visualización anterior, se puede observar que la densidad mayor está en las publicaciones con menos de 1,000 retuits, sin embargo la densidad hacia los 5,000 retuits no se reduce de manera drástica, sino que la tendencia es estable.
 
-
 ### Respuestas
 
 ```{r respuestas, echo=FALSE}
@@ -461,7 +460,9 @@ tidy_presirvienta %>%
     theme(legend.position = "none")
 ```
 
-```{r repviolin}
+En el caso de las publicaciones que han sido respondidas por otros usuarios, la emoción con mayor densidad es la sorpresa, seguido de la alegría. Sin embargo, la emoción con tuits con mayor número de respuesta es la confianza.
+
+```{r repviolin, echo=FALSE}
 tidy_presirvienta %>% 
   filter(reply_count > 50) %>% 
   ggplot(aes(x = 1, y = reply_count)) +
@@ -469,16 +470,18 @@ tidy_presirvienta %>%
     labs(x = NULL,
          y = "Número de Respuestas",
          title = 'Gráfico de violín de respuestas',
-         subtitle = 'Retuits mayores a 50'
+         subtitle = 'Número de respuestas mayores a 50'
     ) +
     scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
     coord_flip() +
     theme_ft_rc()
 ```
 
+En el caso de los tuits que fueron respodidos por otros usuarios, la densidad esta alrededor de las 100 respuestas, la tendencia hacia el mayor número mantiene estabilidad hacia el 1,000, reduciendose a partir de esa cantidad de respuestas.
+
 ### Citaciones
 
-```{r citaciones}
+```{r citaciones, echo=FALSE}
 
 tidy_presirvienta %>% 
   filter(quote_count < 100) %>% 
@@ -497,7 +500,9 @@ tidy_presirvienta %>%
 
 ```
 
-```{r quoteviolin}
+En cuanto a los tuits que fueron citados, la densidad está en las emociones: sopresa y alegría, sin embargo, los tuits con mayor número de citaciones son los tuis que expresan sorpresa y tristeza.
+
+```{r quoteviolin, echo=FALSE}
 tidy_presirvienta %>% 
   filter(quote_count > 50) %>% 
   ggplot(aes(x = 1, y = quote_count)) +
@@ -512,9 +517,11 @@ tidy_presirvienta %>%
     theme_ft_rc()
 ```
 
+Tomando todo el número de tuits que fueron citados, la densidad se sitúa alrededor de los 80 citaciones, la distribución hacia el mayor número de citas se va reduciendo sin embargo aumenta un poco la densidad pasando las 250 citaciones.
+
 ### Impresiones
 
-```{r impresiones}
+```{r impresiones, echo=FALSE}
 
 library(scales)
 
@@ -538,7 +545,9 @@ tidy_presirvienta %>%
 
 ```
 
-```{r}
+Las emociones con mayor densidad en el caso de los tuits con mayores impresiones, se sitúan en las emociones sorpresa y alegría, de igual modo, las emociones con tuits con mayor número de impresiones, son la alegría y la sorpresa.
+
+```{r violin_impresion, echo=FALSE}
 tidy_presirvienta %>% 
   filter(impression_count > 10000) %>% 
   ggplot(aes(x = 1, y = impression_count)) +
@@ -552,6 +561,8 @@ tidy_presirvienta %>%
     coord_flip() +
     theme_ft_rc()
 ```
+
+En el caso de los tuits que recibieron impresiones, la densidad está en los tuis que tuvieron alrededor de 50,000 impresiones, la tendencia se reduce drasticamente, aumentando un poco pasando los 150,000. Se reduce entre los 250,000 y 400,000, aumentando un poco a partir de esta cifra.
 
 ### Plots sobre interacciones
 
