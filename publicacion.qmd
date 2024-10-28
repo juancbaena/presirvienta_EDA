@@ -20,6 +20,10 @@ library(stargazer)
 
 # Análisis Exploratorio de Datos sobre las publicaciones que usa el término "Presirvienta" en la red social "X"
 
+Por: Lic. Juan Carlos Baena Silva, MH
+
+Candidato a doctor en Humanidades, miembro fundador del Colectivo de Investigación Transvectorial (CIT)
+
 ## Introducción
 
 ## Metodología
