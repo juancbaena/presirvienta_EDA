@@ -566,9 +566,11 @@ En el caso de los tuits que recibieron impresiones, la densidad está en los tui
 
 ### Plots sobre interacciones
 
+A continuación se visualizan las relaciones entre las interacciones, tomando como base el número de likes para entender el comportamiento y relaciones entre estas variables de interacción.
+
 ### Likes vs. Respuestas
 
-```{r plot1}
+```{r likevsrespuestas, echo=FALSE}
 
 interacciones_presirvienta %>% 
   filter(like_count>50, reply_count > 50) %>% 
