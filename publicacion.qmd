@@ -125,7 +125,7 @@ ggplot(conteoretw, aes(x = "", y = count, fill = is_retweet)) +
 
 En este gráfico puede observarse que en la base de datos solo se registró que el 1 porciento de las publicaciones son retuit, lo cual quiere decir que esta base de datos está compuesta de principalmente tuits originales.
 
-### is quote
+### Citación de las publicaciones
 
 ```{r is_quote, echo=FALSE}
     # Crear el dataframe con el conteo de "is_reply"
@@ -146,9 +146,11 @@ En este gráfico puede observarse que en la base de datos solo se registró que 
                 position = position_stack(vjust = 0.5)) # Añadir etiquetas con porcentajes
 ```
 
+En el caso de las publicaciones que son una cita de otro tuit, solo el 19 porciento pertenecen a ese rubro, lo cual representa solamente 121 tuits de 628.
+
 ### is reply
 
-```{r reply}
+```{r reply, echo=FALSE}
 # Crear el dataframe con el conteo de "is_reply"
 conteo_is_reply <- table(tidy_presirvienta$is_reply)
 conteorep <- as.data.frame(conteo_is_reply)
@@ -169,9 +171,11 @@ ggplot(conteorep, aes(x = "", y = count, fill = is_reply)) +
 
 ```
 
-## Caractéristicas principales de las publicaciones
+En la base de datos, 238 tuits son respuesta a otro tuit, esta cifra represena el 38 por ciento de las publicaciones, por tanto podemos afirmar que aproximadamente la mitad de las publicaciones o son una cita, o respuesta o un retuiteo, la otra mitad son tuits sin ningun tipo de estas interacciones.
 
-```{r nva_dataframe}
+## Caractéristicas numericas de las publicaciones
+
+```{r nva_dataframe, echo=FALSE}
 # Nueva dataframe para manejar menos datos
 
 interacciones_presirvienta <- tidy_presirvienta %>% 
@@ -182,9 +186,11 @@ interacciones_presirvienta <- tidy_presirvienta %>%
 
 ```
 
+A continuación se presentan los resultados del análisis explorativo de todas las interacciones que se expresan de manera numérica.
+
 ### Conteo de autores
 
-```{r autores}
+```{r autores, echo=FALSE}
 
 interacciones_presirvienta %>% 
   select(author) %>% 
@@ -202,9 +208,11 @@ interacciones_presirvienta %>%
 
 ```
 
+En esta gráfica se puede observar que el usuario de "X" @Capitan_Nemo es el autor que más tuits publicó con la palabra Presirvienta, 16 tuits. En el segundo lugar está \@ImpudorPolítico y \@politicmemesmx con 12 publicaciones. en tercero \@ar2_mx con 10 publicaciones.
+
 ### Conteo de menciones
 
-```{r menciones}
+```{r menciones, echo=FALSE}
 
 interacciones_presirvienta %>% 
   select(mentions) %>%
@@ -223,9 +231,11 @@ interacciones_presirvienta %>%
 
 ```
 
+En el caso de los usuarios con más menciones está en primer lugar \@Claudiashein con 60 menciones y en segundo lugar \@Melissa_Bely con 19 menciones, se puede notar una diferencia importante entre las menciones.
+
 ### Conteo de Hashtags
 
-```{r hashtags1}
+```{r hashtags1, echo=FALSE}
 interacciones_presirvienta %>%   
   select(hashtags) %>%
   mutate(hashtags = strsplit(as.character(hashtags), ",")) %>% 
@@ -242,9 +252,9 @@ interacciones_presirvienta %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-El mismo gráfico quitando #Presirvienta
+En el caso del conteo de hashtags, aparece con mayo número de menciones, como es de esperarse, la palabra Presirvienta, con alrededor de 300 publicaciones que emplean ese hashtag, sin embargo aparecen otros hashtagas que merecen mencionarse.
 
-```{r hashtags2}
+```{r hashtags2, echo=FALSE}
 interacciones_presirvienta %>%   
   select(hashtags) %>%
   mutate(hashtags = strsplit(as.character(hashtags), ",")) %>% 
@@ -261,6 +271,8 @@ interacciones_presirvienta %>%
   theme_ft_rc() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+En el mismo gráfico quitando #Presirvienta, se puede observar mejor otros hashtags que aparecen en las publicaciones
 
 ### Conteo de orígenes
 
