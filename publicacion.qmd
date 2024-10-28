@@ -587,9 +587,11 @@ interacciones_presirvienta %>%
 
 ```
 
+En el caso del número de likes y el número de respuestas, los tuits que tienen menos de 7500 likes y menos de 1000 respuestas, tienen una relación pues aumentan acorde a la misma tendencia, sin embargo en el caso de los tuis con mayor número de likes, no siguen una dirección lineal, sino que van decreciendo, de tal manera que el último tuit, con más de 15,000 likes, sus número de respuestas no aumenta con la misma tendencia lineal que los tuits con menos likes.
+
 ### Likes vs. retuits
 
-```{r plot2}
+```{r likevsretuit, echo=FALSE}
 
 interacciones_presirvienta %>% 
   filter(like_count> 100, retweet_count > 100) %>% 
