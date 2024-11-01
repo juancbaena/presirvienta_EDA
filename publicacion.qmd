@@ -4,7 +4,6 @@ subtitle: 'Hallazgos en torno al uso del #Presirvienta en "X"'
 author: "Juan Carlos Baena"
 format: html
 toc: true
-number-sections: true
 ---
 
 ```{r librerías, include=FALSE}
@@ -15,6 +14,8 @@ library(hrbrthemes)
 library(scales)
 library(ggsci)
 library(stargazer)
+library(kableExtra)
+import_roboto_condensed()
 
 ```
 
@@ -76,24 +77,39 @@ A continuacion se presentan algunas graficas que permiten entender las publicaci
 
 ### Resumen de los datos
 
-```{r summary, echo=FALSE}
+```{r summary, include=FALSE}
 
 datosdf <- tidy_presirvienta %>% 
   select(retweet_count, reply_count, like_count, quote_count, impression_count, Word.count, sentiment)
 
-stargazer(datosdf,
-digits=2,
-title="Descripción de los datos numéricos",
-type = "text")
-
-
 ```
+
+```{r tablas r, echo=FALSE}
+datosdf %>%
+  gather(key = "Variable", value = "Valor") %>%
+  group_by(Variable) %>%
+  summarise(
+    N = n(),
+    Media = mean(Valor, na.rm = TRUE),
+    `Desv. Est.` = sd(Valor, na.rm = TRUE),
+    Mediana = median(Valor, na.rm = TRUE),
+    Mínimo = min(Valor, na.rm = TRUE),
+    Máximo = max(Valor, na.rm = TRUE)
+  ) %>%
+  kable(
+    format = "markdown",
+    digits = 2,
+    caption = "Estadísticas descriptivas"
+  )
+```
+
 
 Esta tabla muestra un resumen estadístico de los datos recopilados que tienen una forma numérica, se puede observar que el total de publicaciones son 628, la publicación con más retuiteos tuvo se retuiteo alrededor de 5000 veces, el promedio de retuiteos es de 71. En el caso de respuestas el promedio es de 13 y la publicación que más tuvo, se respondió 1474 veces. En el caso de los likes, la publicación con más likes tuvo 16,168 y en promedio tuvieron 155 likes las publicaciones. En el caso de citaciones el promedio es de 2 y el máscimo es de 290. Las impresiones tienen un promedio de 4,714 y la publicación que más impresiones tuvo fue 454,838. El análisis de sentimientos y el conteo de palabras se analizará más adelante.
 
 ### Histograma de publicaciones
 
 ```{r Hist dia, echo=FALSE}
+
 tidy_presirvienta %>% 
   mutate(day = as.Date(timestamp)) %>%  # Convertimos 'timestamp' a tipo Date
   ggplot(aes(x = day)) +
