@@ -1,0 +1,69 @@
+---
+title: "histogramas"
+author: "Juan Baena"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, echo= FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(hrbrthemes)
+```
+
+
+
+```{r datos, echo=FALSE}
+tidy_presirvienta <- read.csv('data/tidy_presirvienta.csv')
+
+#Convertir a formato de fecha
+
+tidy_presirvienta$timestamp <- ymd_hms(tidy_presirvienta$timestamp)
+
+# Convertir a factores
+convertir_fact <- c('author', 'source', 'is_retweet',	'retweeted_user',	'is_quote_tweet',	'quoted_user',	'is_quote_withheld',	'is_reply',	'replied_user',	'is_withheld', 'Emotion')
+
+tidy_presirvienta[convertir_fact] <- lapply(tidy_presirvienta[convertir_fact], as.factor)
+
+# Filtrar las entradas entre el 1 de octubre y el 8 de octubre
+
+# Definir el rango de fechas
+start_date <- ymd("2024-10-01")
+end_date <- ymd("2024-10-08")
+
+# Filtrar las filas dentro del rango de fechas
+tidy_presirvienta <- tidy_presirvienta %>%
+  filter(timestamp >= start_date & timestamp <= end_date)
+```
+
+
+```{r}
+tidy_presirvienta %>% 
+  filter(like_count < 1500) %>% 
+  ggplot(aes(x= like_count)) +
+  geom_histogram(binwidth = 10)+
+  theme_ft_rc() +
+  labs(
+    title = "Distribución del conteo de likes",
+    x = "Número de likes",
+    y = "Frecuencia"
+  )
+
+```
+
+```{r}
+tidy_presirvienta %>% 
+  filter(like_count < 1500) %>% 
+  ggplot(aes(x= like_count)) +
+  geom_histogram(binwidth = 10, colour = ft_cols$red)+
+  theme_ft_rc() +
+  facet_wrap( ~Emotion)
+  labs(
+    title = "Distribución del conteo de likes",
+    x = "Número de likes",
+    y = "Frecuencia"
+  )
+
+```
+
+
