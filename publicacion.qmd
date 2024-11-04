@@ -688,4 +688,261 @@ tidy_presirvienta %>%
   )
 ```
 
+## Exploración sobre los textos de las publicaciones
+
+```{r librerias, include=FALSE}
+library(stringr)
+library(tidyverse)
+library(tidytext)
+library(tm)
+library(lubridate)
+library(hrbrthemes)
+library(wordcloud2)
+
+```
+
+```{r dataframe, include=FALSE, echo=FALSE}
+tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
+# Se escogen solo las columnas que van a servirnos
+
+tidy_presirvienta1 <- tidy_presirvienta1 %>% 
+  select(id, timestamp, author, body, Emotion)
+
+# Convertir a formato de fecha
+tidy_presirvienta1$timestamp <- ymd_hms(tidy_presirvienta1$timestamp)
+
+# Filtrar las entradas entre el 1 de octubre y el 8 de octubre
+
+# Definir el rango de fechas
+start_date <- ymd("2024-10-01")
+end_date <- ymd("2024-10-08")
+
+# Filtrar las filas dentro del rango de fechas
+tidy_presirvienta1 <- tidy_presirvienta1 %>%
+  filter(timestamp >= start_date & timestamp <= end_date)
+
+```
+
+```{r limpieza, include=FALSE, echo=FALSE}
+
+limp_presirvienta <- tidy_presirvienta1 %>%
+  select(timestamp, author, body, Emotion) %>%
+  mutate(body = str_replace_all(body, '(http|https)[^([:blank:]|\\"|<|&|#\n\r)]+', "")) %>%
+  mutate(body = str_replace_all(body, "@\\S+", "")) %>%
+  unnest_tokens(word, body) %>%
+  anti_join(tibble(word = tm::stopwords("es")))
+  
+```
+
+A continuación se presenta el trabajo 
+
+### Bigramas
+
+```{r bigramas, include=FALSE, echo=FALSE}
+
+bigram_presirvienta <- tidy_presirvienta1 %>%
+  select(timestamp, author, body, Emotion) %>%
+  mutate(body = str_replace_all(body, '(http|https)[^([:blank:]|\\"|<|&|#\n\r)]+', "")) %>%
+  mutate(body = str_replace_all(body, "@\\S+", "")) %>%
+  unnest_tokens(bigram, body, token = "ngrams", n = 2) %>% 
+  separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  anti_join(tibble(word1 = tm::stopwords("es"))) %>% 
+  anti_join(tibble(word2 = tm::stopwords("es"))) %>%
+  unite(bigram, word1, word2, sep = " ")
+
+```
+
+
+```{r conteosbigramas, include=FALSE, echo=FALSE}
+#conteo de ocurrencias por palabras gral.
+conteobigramas_presirvienta <- bigram_presirvienta %>% 
+  count(bigram, sort = TRUE) %>% 
+  filter(!bigram == 'NA NA') %>% 
+  filter(!bigram == 'presirvienta presirvienta')
+#conteo de palabras por día
+bigramdia_presirvienta <- bigram_presirvienta %>% 
+  mutate(date = as_date(timestamp)) %>%
+  group_by(date) %>%
+  count(bigram, sort = TRUE) %>% 
+  filter(!bigram == 'NA NA') %>% 
+  filter(!bigram == 'presirvienta presirvienta')
+
+#conteo de palabras por emoción del tuit
+
+bigramemocion_presirvienta <- bigram_presirvienta %>% 
+  group_by(Emotion) %>% 
+  count(bigram, sort=TRUE) %>% 
+  filter(!bigram == 'NA NA') %>% 
+  filter(!bigram == 'presirvienta presirvienta')
+```
+
+### Gráficas bigramas
+
+```{r graficas_bigramas, echo=FALSE}
+
+conteobigramas_presirvienta %>% 
+  filter(n > 6) %>%
+  mutate(bigram = reorder(bigram, n)) %>%
+  ggplot(aes(n, bigram)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  labs(y = NULL, x = 'conteo',
+       title = 'Bigramas con ocurrencia mayor a 6')+
+  theme(legend.position = "none")+
+  theme_ft_rc()
+```
+
+
+Grafica por día
+
+```{r bigrama_dia, echo=FALSE}
+bigramdia_presirvienta %>%
+  filter(n>3) %>% 
+  mutate(bigram = reorder(bigram, n)) %>%
+  ggplot(aes(n, bigram)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  facet_wrap(~ date, scales = "free") +
+  labs(y = NULL, x = 'conteo',
+       title = 'Bigramas con más ocurrencias por día')+
+  theme(legend.position = "none", date_labels = "%d/%m/%Y")+
+  theme_ft_rc() 
+```
+
+
+Gráfica por emocion
+
+```{r bigrama_emocion, echo=FALSE}
+
+bigramemocion_presirvienta%>%
+  filter(n>3) %>% 
+  mutate(bigram = reorder(bigram, n)) %>%
+  ggplot(aes(n, bigram)) +
+  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
+  facet_wrap(~ Emotion, scales = "free") +
+  labs(y = NULL, x = 'conteo',
+       title = 'Palabras con más ocurrencias por Emoción')+
+  theme(legend.position = "none")+
+  theme_ft_rc() 
+
+
+```
+
+
+### Nube de palabras bigrama
+
+```{r nube de palabras, echo=FALSE}
+
+wordcloud2(conteobigramas_presirvienta, color = 'random-light'  , backgroundColor = ft_cols$slate)
+```
+
+
+```{r librerías, include=FALSE}
+library(topicmodels)
+library(tm)
+library(tidytext)
+library(ggplot2)
+library(dplyr)
+library(SnowballC)
+library(hrbrthemes)
+library(ggsci)
+
+```
+
+# Topic modeling #Presirvienta
+## Limpieza del corpus
+
+```{r cargardf}
+tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
+# Se escogen solo las columnas que van a servirnos
+
+tidy_presirvienta1 <- tidy_presirvienta1 %>% 
+  select(id, timestamp, author, body, Emotion)
+```
+
+
+```{r limpieza}
+document <- Corpus(VectorSource(tidy_presirvienta1$body))
+# limpieza del texto
+document <- tm_map(document, content_transformer(tolower))
+document <- tm_map(document, removeNumbers)
+
+document <- tm_map(document, removePunctuation, preserve_intra_word_dashes = TRUE)
+document <- tm_map(document, removeWords, c(stopwords("es"), "presirvienta"))
+document <- tm_map(document, stripWhitespace)
+
+removeURLs <- function(x) {
+  gsub("http[[:alnum:][:punct:]]*", "", x)
+}
+# Función para eliminar emojis
+removeEmojis <- function(x) {
+  gsub("[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|[\U0001F680-\U0001F6FF]|[\U0001F700-\U0001F77F]|[\U0001F780-\U0001F7FF]|[\U0001F800-\U0001F8FF]|[\U0001F900-\U0001F9FF]|[\U0001FA00-\U0001FA6F]|[\U0001FA70-\U0001FAFF]|[\U00002702-\U000027B0]|[\U000024C2-\U0001F251]", "", x, perl = TRUE)
+}
+
+# Aplicar las funciones al corpus
+document <- tm_map(document, content_transformer(removeURLs))
+document <- tm_map(document, content_transformer(removeEmojis))
+```
+
+## Preparando para el topic modeling
+
+```{r preparación}
+# Crear la Document-Term Matrix
+dtm <- DocumentTermMatrix(document)
+
+# Eliminar términos poco frecuentes
+dtm <- removeSparseTerms(dtm, 0.99)
+
+row_sums <- rowSums(as.matrix(dtm))
+empty_docs <- which(row_sums == 0)
+
+#Eliminar documentos vacíos
+dtm <- dtm[row_sums > 0, ]
+
+# Establecer el número de tópicos
+num_topics <- 10
+
+# Ajustar el modelo LDA
+lda_model <- LDA(dtm, k = num_topics, control = list(seed = 1234))
+
+# Ver los términos principales de cada tópico
+terms(lda_model, 10)  # 10 términos principales por tópico
+
+# Ver la distribución de tópicos en los documentos
+topics(lda_model)
+```
+## Extraer las 10 principales palabras de cada tópico
+
+```{r extraer}
+# Extraer los términos principales de cada tópico junto con sus valores beta
+top_terms <- terms(lda_model, 10)
+beta_matrix <- posterior(lda_model)$terms
+
+# Crear una lista para almacenar los datos
+top_terms_list <- list()
+
+# Recorrer cada tópico
+for (topic in 1:num_topics) {
+  terms_beta <- beta_matrix[topic, top_terms[, topic]]
+  top_terms_list[[topic]] <- data.frame(
+    topic = rep(topic, length(terms_beta)),
+    term = names(terms_beta),
+    beta = terms_beta
+  )
+}
+
+# Combinar todos los dataframes en uno solo
+top_terms_df <- do.call(rbind, top_terms_list)
+
+# Crear la gráfica
+ggplot(top_terms_df, aes(x = reorder(term, -beta), y = beta, fill = factor(topic))) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip() +
+  labs(title = "Top 10 Palabras por Tópico", x = "Palabra", y = "Valor Beta") +
+   theme_ft_rc() +
+  scale_color_ucscgb()
+
+```
+
+
+
 ## Conclusiones
