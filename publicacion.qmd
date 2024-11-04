@@ -628,6 +628,8 @@ interacciones_presirvienta %>%
 
 ```
 
+La relación entre el número de likes y el número de retuits no sigue una relación lineal, los tuits con menos de 5,000 likes siguen una tendencia lineal con respecto al número de retuits, sin embargo al pasar los 5,000 likes, la tendencia cambia para describir una curva descendente.
+
 ### Likes vs. Impresiones
 
 ```{r likevsimpresiones,  echo=FALSE}
@@ -649,6 +651,8 @@ interacciones_presirvienta %>%
 
 ```
 
+La tendencia de la relación entre likes e impresiones sigue una curva ascendente más clara que con las anteriores relaciones, sin embargo no sigue una relación lineal, por tanto, es posible afirmar que si bien el número de impresiones y el número de likes tienen una relación, su relación no es totalmente correlacionada.
+
 ### Likes vs. Sentimientos
 
 ```{r likevssentim,  echo=FALSE}
@@ -669,38 +673,18 @@ tidy_presirvienta %>%
   )
 ```
 
-### Likes vs. Sentimientos filtrados por cita
+En la gráfica anterior se puede observar que el número de likes relacionado con la valoración de los sentimientos, los tuits con mayor densidad son aquellos que están en los valores neutrales, sin embargo tanto en los tuits que son respuesta y los que no son, la gráfica tienen una tendencia hacia los valores negativos, por tanto, existe mayor densidad hacia los valores negativos.
 
-```{r likesvssentimcit,  echo=FALSE}
-tidy_presirvienta %>% 
-  filter(like_count<200) %>% 
-  ggplot(aes(x = like_count, y= sentiment, color = Emotion)) +
-  geom_point() +
-  scale_color_ucscgb() +
-  theme_ft_rc() +
-   scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))+
-  facet_wrap( ~ is_quote_tweet)+
-  labs(
-    x = 'Número de likes',
-    y = 'Valores de sentimientos',
-    title = 'Likes vs. Sentimientos',
-    subtitle = 'Filtrado por cita'
-  )
-```
 
 ## Exploración sobre los textos de las publicaciones
 
 ```{r librerias, include=FALSE}
 library(stringr)
-library(tidyverse)
 library(tidytext)
 library(tm)
-library(lubridate)
-library(hrbrthemes)
 library(wordcloud2)
 
 ```
-
 ```{r dataframe, include=FALSE, echo=FALSE}
 tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 # Se escogen solo las columnas que van a servirnos
@@ -722,7 +706,6 @@ tidy_presirvienta1 <- tidy_presirvienta1 %>%
   filter(timestamp >= start_date & timestamp <= end_date)
 
 ```
-
 ```{r limpieza, include=FALSE, echo=FALSE}
 
 limp_presirvienta <- tidy_presirvienta1 %>%
@@ -733,11 +716,9 @@ limp_presirvienta <- tidy_presirvienta1 %>%
   anti_join(tibble(word = tm::stopwords("es")))
   
 ```
-
-A continuación se presenta el trabajo 
+A continuación se presenta el trabajo de análisis de la columna del contenido textual de la base de datos, se presentan diferentes gráficos para entender mejor el contenido de los tuits de la base de datos.
 
 ### Bigramas
-
 ```{r bigramas, include=FALSE, echo=FALSE}
 
 bigram_presirvienta <- tidy_presirvienta1 %>%
@@ -751,8 +732,6 @@ bigram_presirvienta <- tidy_presirvienta1 %>%
   unite(bigram, word1, word2, sep = " ")
 
 ```
-
-
 ```{r conteosbigramas, include=FALSE, echo=FALSE}
 #conteo de ocurrencias por palabras gral.
 conteobigramas_presirvienta <- bigram_presirvienta %>% 
@@ -775,9 +754,8 @@ bigramemocion_presirvienta <- bigram_presirvienta %>%
   filter(!bigram == 'NA NA') %>% 
   filter(!bigram == 'presirvienta presirvienta')
 ```
-
-### Gráficas bigramas
-
+El primer trabajo de análisis es contabilizar lo que se ha denominado bigramas, se contabiliza la combinación de 2 palabras que más se repiten, con esto se busca entender qué palabras son las más usadas, pero también combinación con otra palabras para lograr tener un mejor contexto del uso de las palabras y lograr extraer significados.
+### Gráficas de los bigramas
 ```{r graficas_bigramas, echo=FALSE}
 
 conteobigramas_presirvienta %>% 
@@ -790,7 +768,7 @@ conteobigramas_presirvienta %>%
   theme(legend.position = "none")+
   theme_ft_rc()
 ```
-
+En este gráfico es posible observar que los bigramas más empleados son, en primer lugar, el nombre de la presidenta: Claudia Sheinbaum. Sin embargo en segundo lugar se emplea presirvienta espuria y en tercer lugar, digan presirvienta. Es importante señalar que aparece el nombre del cómico mexicano: Rafael Inclan en cuarto lugar.
 
 Grafica por día
 
@@ -806,7 +784,7 @@ bigramdia_presirvienta %>%
   theme(legend.position = "none", date_labels = "%d/%m/%Y")+
   theme_ft_rc() 
 ```
-
+Los bigramas acomodados por día sus frecuencias, es posible observar que el día 2 de Octubre se repiten bigramas con adjetivos calificativos hacia la presidenta, en los otros días, exceptuando el 7, la combinación dígan presirvienta aparece con mayor frecuencia.
 
 Gráfica por emocion
 
@@ -825,31 +803,13 @@ bigramemocion_presirvienta%>%
 
 
 ```
-
-
-### Nube de palabras bigrama
-
-```{r nube de palabras, echo=FALSE}
-
-wordcloud2(conteobigramas_presirvienta, color = 'random-light'  , backgroundColor = ft_cols$slate)
-```
-
-
+En este conjunto de gráficos es posible observar que la emoción con mayor densidad de bigramas es tristeza y en segundo lugar es sorpresa. De ggual manera aparece el nombre de la presidenta como bigrama con más ocurrencias.
 ```{r librerías, include=FALSE}
 library(topicmodels)
 library(tm)
-library(tidytext)
-library(ggplot2)
-library(dplyr)
 library(SnowballC)
-library(hrbrthemes)
-library(ggsci)
-
 ```
-
-# Topic modeling #Presirvienta
-## Limpieza del corpus
-
+## Topic modeling #Presirvienta
 ```{r cargardf, include=FALSE}
 tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 # Se escogen solo las columnas que van a servirnos
@@ -857,8 +817,6 @@ tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 tidy_presirvienta1 <- tidy_presirvienta1 %>% 
   select(id, timestamp, author, body, Emotion)
 ```
-
-
 ```{r limpieza, include=FALSE, echo=FALSE}
 document <- Corpus(VectorSource(tidy_presirvienta1$body))
 # limpieza del texto
