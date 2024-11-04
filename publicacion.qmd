@@ -850,7 +850,7 @@ library(ggsci)
 # Topic modeling #Presirvienta
 ## Limpieza del corpus
 
-```{r cargardf}
+```{r cargardf, include=FALSE}
 tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 # Se escogen solo las columnas que van a servirnos
 
@@ -859,7 +859,7 @@ tidy_presirvienta1 <- tidy_presirvienta1 %>%
 ```
 
 
-```{r limpieza}
+```{r limpieza, include=FALSE, echo=FALSE}
 document <- Corpus(VectorSource(tidy_presirvienta1$body))
 # limpieza del texto
 document <- tm_map(document, content_transformer(tolower))
@@ -882,9 +882,7 @@ document <- tm_map(document, content_transformer(removeURLs))
 document <- tm_map(document, content_transformer(removeEmojis))
 ```
 
-## Preparando para el topic modeling
-
-```{r preparación}
+```{r preparación, include=FALSE, echo=FALSE}
 # Crear la Document-Term Matrix
 dtm <- DocumentTermMatrix(document)
 
@@ -909,9 +907,8 @@ terms(lda_model, 10)  # 10 términos principales por tópico
 # Ver la distribución de tópicos en los documentos
 topics(lda_model)
 ```
-## Extraer las 10 principales palabras de cada tópico
 
-```{r extraer}
+```{r extraer, echo=FALSE}
 # Extraer los términos principales de cada tópico junto con sus valores beta
 top_terms <- terms(lda_model, 10)
 beta_matrix <- posterior(lda_model)$terms
