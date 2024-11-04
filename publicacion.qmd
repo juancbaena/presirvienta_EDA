@@ -13,7 +13,6 @@ library(ggthemes)
 library(hrbrthemes)
 library(scales)
 library(ggsci)
-library(stargazer)
 library(kableExtra)
 import_roboto_condensed()
 
@@ -51,6 +50,7 @@ end_date <- ymd("2024-10-08")
 # Filtrar las filas dentro del rango de fechas
 tidy_presirvienta <- tidy_presirvienta %>%
   filter(timestamp >= start_date & timestamp <= end_date)
+
 ```
 
 La base de datos resultado del proceso de recopilación y limpieza se puede resumir de la siguiente manera:
