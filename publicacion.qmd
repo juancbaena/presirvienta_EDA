@@ -6,7 +6,7 @@ format: html
 toc: true
 ---
 
-```{r librerías, include=FALSE}
+```{r librerias1, include=FALSE}
 library(tidyverse)
 library(lubridate)
 library(ggthemes)
@@ -678,7 +678,7 @@ En la gráfica anterior se puede observar que el número de likes relacionado co
 
 ## Exploración sobre los textos de las publicaciones
 
-```{r librerias, include=FALSE}
+```{r librerias2, include=FALSE}
 library(stringr)
 library(tidytext)
 library(tm)
@@ -809,7 +809,10 @@ library(topicmodels)
 library(tm)
 library(SnowballC)
 ```
-## Topic modeling #Presirvienta
+## Modelado de tópicos #Presirvienta
+
+El modelado de tópicos es un proceso que permite identificar patrones de tópicos en un conjunto de textos, en esta ocasión se realizó este modelado a partir del contenido de los tuits recopilados en la búsqueda con el termino "Presirvienta"
+
 ```{r cargardf, include=FALSE}
 tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 # Se escogen solo las columnas que van a servirnos
@@ -817,7 +820,7 @@ tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 tidy_presirvienta1 <- tidy_presirvienta1 %>% 
   select(id, timestamp, author, body, Emotion)
 ```
-```{r limpieza, include=FALSE, echo=FALSE}
+```{r limpieza2, include=FALSE, echo=FALSE}
 document <- Corpus(VectorSource(tidy_presirvienta1$body))
 # limpieza del texto
 document <- tm_map(document, content_transformer(tolower))
@@ -839,7 +842,6 @@ removeEmojis <- function(x) {
 document <- tm_map(document, content_transformer(removeURLs))
 document <- tm_map(document, content_transformer(removeEmojis))
 ```
-
 ```{r preparación, include=FALSE, echo=FALSE}
 # Crear la Document-Term Matrix
 dtm <- DocumentTermMatrix(document)
@@ -865,7 +867,6 @@ terms(lda_model, 10)  # 10 términos principales por tópico
 # Ver la distribución de tópicos en los documentos
 topics(lda_model)
 ```
-
 ```{r extraer, echo=FALSE}
 # Extraer los términos principales de cada tópico junto con sus valores beta
 top_terms <- terms(lda_model, 10)
@@ -898,6 +899,12 @@ ggplot(top_terms_df, aes(x = reorder(term, -beta), y = beta, fill = factor(topic
 
 ```
 
+En estos gráficos se infiere que el primer núcleo de significados hace referencia a la presidenta y cómo la nombran "presirvienta", además la palabra "amo" aparece completando el significado del tópico, indicando servilismo por parte de la Presidenta. 
 
+En el segundo núcleo aparece el nombre de Rafael Inclán y la palabra ama de casa, haciendo referencia a las declaraciones del cómico. En el tercer núcleo, al igual que el quinto, harían referencia a la idea que el sexenio de la Presidenta sería igual al sexenio pasado, una "calca" del anterior. 
+
+En el cuarto núcleo se ubican aquellos contenidos que hablarían de una crítica hacia el expresidente y hacia la Presidenta, sin embargo aparece también el adjetivo "chairos"  ubicandolo en torno a está crítica.
+
+En el sexto y séptimo núcleos, aparece el adjetivo "espúria" también hace referencia a la acción de la Presidenta de besar la mano de el político Manuel Velazco. En el caso de los núcleos 8, 9 y 10 no se puede apreciar un significado relevante.
 
 ## Conclusiones
