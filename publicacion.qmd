@@ -622,7 +622,9 @@ bigramemocion_presirvienta <- bigram_presirvienta %>%
   filter(!bigram == 'presirvienta presirvienta')
 ```
 
-El primer trabajo de análisis es contabilizar lo que se ha denominado bigramas, se contabiliza la combinación de 2 palabras que más se repiten, con esto se busca entender qué palabras son las más usadas, pero también combinación con otra palabras para lograr tener un mejor contexto del uso de las palabras y lograr extraer significados. \### Gráficas de los bigramas
+El primer trabajo de análisis es contabilizar lo que se ha denominado bigramas, se contabiliza la combinación de 2 palabras que más se repiten, con esto se busca entender qué palabras son las más usadas, pero también combinación con otra palabras para lograr tener un mejor contexto del uso de las palabras y lograr extraer significados.
+
+### Gráficas de los bigramas
 
 ```{r graficas_bigramas, echo=FALSE}
 
@@ -638,43 +640,6 @@ conteobigramas_presirvienta %>%
 ```
 
 En este gráfico es posible observar que los bigramas más empleados son, en primer lugar, el nombre de la presidenta: Claudia Sheinbaum. Sin embargo en segundo lugar se emplea presirvienta espuria y en tercer lugar, digan presirvienta. Es importante señalar que aparece el nombre del cómico mexicano: Rafael Inclan en cuarto lugar.
-
-Grafica por día
-
-```{r bigrama_dia, echo=FALSE}
-bigramdia_presirvienta %>%
-  filter(n>3) %>% 
-  mutate(bigram = reorder(bigram, n)) %>%
-  ggplot(aes(n, bigram)) +
-  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
-  facet_wrap(~ date, scales = "free") +
-  labs(y = NULL, x = 'conteo',
-       title = 'Bigramas con más ocurrencias por día')+
-  theme(legend.position = "none", date_labels = "%d/%m/%Y")+
-  theme_ft_rc() 
-```
-
-Los bigramas acomodados por día sus frecuencias, es posible observar que el día 2 de Octubre se repiten bigramas con adjetivos calificativos hacia la presidenta, en los otros días, exceptuando el 7, la combinación dígan presirvienta aparece con mayor frecuencia.
-
-Gráfica por emocion
-
-```{r bigrama_emocion, echo=FALSE}
-
-bigramemocion_presirvienta%>%
-  filter(n>3) %>% 
-  mutate(bigram = reorder(bigram, n)) %>%
-  ggplot(aes(n, bigram)) +
-  geom_col(colour = ft_cols$slate, fill = ft_cols$red) +
-  facet_wrap(~ Emotion, scales = "free") +
-  labs(y = NULL, x = 'conteo',
-       title = 'Palabras con más ocurrencias por Emoción')+
-  theme(legend.position = "none")+
-  theme_ft_rc() 
-
-
-```
-
-En este conjunto de gráficos es posible observar que la emoción con mayor densidad de bigramas es tristeza y en segundo lugar es sorpresa. De ggual manera aparece el nombre de la presidenta como bigrama con más ocurrencias.
 
 ```{r librerías, include=FALSE}
 library(topicmodels)
