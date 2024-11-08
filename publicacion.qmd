@@ -1,7 +1,4 @@
 ---
-title: "Publicación Presirvienta"
-subtitle: 'Hallazgos en torno al uso del #Presirvienta en "X"'
-author: "Juan Carlos Baena"
 format: html
 toc: true
 ---
@@ -53,7 +50,6 @@ tidy_presirvienta <- tidy_presirvienta %>%
 
 ```
 
-La base de datos resultado del proceso de recopilación y limpieza se puede resumir de la siguiente manera:
 
 La metodología que se siguió para esta investigación consistió en:
 
@@ -67,7 +63,7 @@ La metodología que se siguió para esta investigación consistió en:
 
 ![](https://es.r4ds.hadley.nz/diagrams_w_text_as_path/es/data-science.svg)
 
-La exploración de esta base de datos, la visualización de los datos, y la interpretación de los hallazgos se presentan a continuación.
+La exploración, la visualización, y la interpretación de los hallazgos de esta base de datos, realizados todos empleando el lenguaje de programación R, se presentan a continuación:
 
 -   Los datos y los códigos empleados se encuentra en el repositorio: <https://github.com/juancbaena/presirvienta_EDA>
 
