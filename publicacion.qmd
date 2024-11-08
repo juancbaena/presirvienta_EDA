@@ -50,7 +50,6 @@ tidy_presirvienta <- tidy_presirvienta %>%
 
 ```
 
-
 La metodología que se siguió para esta investigación consistió en:
 
 1.  Recopilación de datos en la red social X, empleando una búsqueda entre los días 1 de octubre y 8 de octubre de todos los tuits en los que apareciera la palabra Presirvienta.
@@ -63,13 +62,13 @@ La metodología que se siguió para esta investigación consistió en:
 
 ![](https://es.r4ds.hadley.nz/diagrams_w_text_as_path/es/data-science.svg)
 
-La exploración, la visualización, y la interpretación de los hallazgos de esta base de datos, realizados todos empleando el lenguaje de programación R, se presentan a continuación:
+La exploración, la visualización, y la interpretación de los hallazgos de esta base de datos[^1], realizados todos empleando el lenguaje de programación R, se presentan a continuación:
 
--   Los datos y los códigos empleados se encuentra en el repositorio: <https://github.com/juancbaena/presirvienta_EDA>
+[^1]: Los datos y la programación empleada, se encuentra en el repositorio: <https://github.com/juancbaena/presirvienta_EDA>
 
-## Resultados
+## Visualizaciones
 
-A continuacion se presentan algunas graficas que permiten entender las publicaciones que emplearon el término presirvienta en la red social "X", del 1 de octurbre al 8 de octubre (la primera semana de la Presidenta Claudia Sheinbaum).
+A continuacion se presentan algunas graficas que permiten entender las publicaciones que emplearon el término presirvienta en la red social "X", del 1 de octubre al 8 de octubre (la primera semana de la Presidenta Claudia Sheinbaum).
 
 ### Resumen de los datos
 
@@ -99,7 +98,6 @@ datosdf %>%
   )
 ```
 
-
 Esta tabla muestra un resumen estadístico de los datos recopilados que tienen una forma numérica, se puede observar que el total de publicaciones son 628, la publicación con más retuiteos tuvo se retuiteo alrededor de 5000 veces, el promedio de retuiteos es de 71. En el caso de respuestas el promedio es de 13 y la publicación que más tuvo, se respondió 1474 veces. En el caso de los likes, la publicación con más likes tuvo 16,168 y en promedio tuvieron 155 likes las publicaciones. En el caso de citaciones el promedio es de 2 y el máscimo es de 290. Las impresiones tienen un promedio de 4,714 y la publicación que más impresiones tuvo fue 454,838. El análisis de sentimientos y el conteo de palabras se analizará más adelante.
 
 ### Histograma de publicaciones
@@ -116,55 +114,9 @@ tidy_presirvienta %>%
 
 ```
 
-En los 7 días que se analizan se puede observar que ni el primero de octubre, ni el 8 de octubre se registraron publicaciones, es importante observar que el día3 de octrubre es el día con más publicaciones, con más de 200 publicaciones ese daía, el día con menos fue el 5 de octubre, con alrededor de 70 publicaciones.
+En los 7 días que se analizan se puede observar que ni el primero de octubre, ni el 8 de octubre se registraron publicaciones, es importante observar que el día 3 de octubre es el día con más publicaciones, con más de 200 publicaciones, el día con menos fue el 5 de octubre, con alrededor de 70 publicaciones.
 
-### Retuiteo de las publicaciones
-
-```{r isretweet1, echo=FALSE}
-# Crear el dataframe con el conteo de "is_reply"
-conteo_is_retweet <- table(tidy_presirvienta$is_retweet)
-conteoretw <- as.data.frame(conteo_is_retweet)
-
-# Renombrar las columnas para ggplot
-colnames(conteoretw) <- c("is_retweet", "count")
-
-# Crear el gráfico de pastel
-ggplot(conteoretw, aes(x = "", y = count, fill = is_retweet)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y") +
-  labs(title = "Distribución de Tweets si son retweet") +
-  scale_fill_manual(values = c("yes" = ft_cols$red , "no" = ft_cols$slate)) + 
-  theme_ft_rc(base_size = 15) +
-  geom_text(aes(label = paste0(count, " (", round(count / sum(count) * 100), "%)")),
-            position = position_stack(vjust = 0.5)) # Añadir etiquetas con porcentajes
-```
-
-En este gráfico puede observarse que en la base de datos solo se registró que el 1 porciento de las publicaciones son retuit, lo cual quiere decir que esta base de datos está compuesta de principalmente tuits originales.
-
-### Citación de las publicaciones
-
-```{r is_quote, echo=FALSE}
-    # Crear el dataframe con el conteo de "is_reply"
-    conteo_is_quote <- table(tidy_presirvienta$is_quote_tweet)
-    conteoquot <- as.data.frame(conteo_is_quote)
-
-    # Renombrar las columnas para ggplot
-    colnames(conteoquot) <- c("is_quote_tweet", "count")
-
-    # Crear el gráfico de pastel
-    ggplot(conteoquot, aes(x = "", y = count, fill = is_quote_tweet)) +
-      geom_bar(stat = "identity", width = 1) +
-      coord_polar("y") +
-      labs(title = "Distribución de Tweets si son cita") +
-      theme_ft_rc(base_size = 15) +
-      scale_fill_manual(values = c("yes" = ft_cols$red , "no" = ft_cols$slate)) + # Colores personalizados
-      geom_text(aes(label = paste0(count, " (", round(count / sum(count) * 100), "%)")),
-                position = position_stack(vjust = 0.5)) # Añadir etiquetas con porcentajes
-```
-
-En el caso de las publicaciones que son una cita de otro tuit, solo el 19 porciento pertenecen a ese rubro, lo cual representa solamente 121 tuits de 628.
-
-### is reply
+### Respuestas
 
 ```{r reply, echo=FALSE}
 # Crear el dataframe con el conteo de "is_reply"
@@ -268,7 +220,7 @@ interacciones_presirvienta %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-En el caso del conteo de hashtags, aparece con mayo número de menciones, como es de esperarse, la palabra Presirvienta, con alrededor de 300 publicaciones que emplean ese hashtag, sin embargo aparecen otros hashtagas que merecen mencionarse.
+En el caso del conteo de hashtags, aparece con mayo número de menciones, como es de esperarse, la palabra Presirvienta, con alrededor de 300 publicaciones que emplean ese hashtag, sin embargo aparecen otros hashtags que merecen mencionarse.
 
 ```{r hashtags2, echo=FALSE}
 interacciones_presirvienta %>%   
@@ -377,7 +329,7 @@ En el análisis de sentimientos, valorados por emociones de las publicaciones, s
 
 ## Interacciones
 
-En el caso de las interacciones que los usuarios tuvieron con las publicaciones de esta base de datos, es importante mencionar que las interacciones son: *Likes*, *Retuits*, *Citaciones* e *Impresiones*.
+En el caso de las interacciones que los usuarios tuvieron con las publicaciones de esta base de datos, es importante mencionar que vamos a analizar solo las interacciones *Likes* y *Retuits*.
 
 ### Likes
 
@@ -438,7 +390,7 @@ tidy_presirvienta %>%
 
 ```
 
-En el caso de las interacciones de los usuarios retuiteando publicaciones, la emoción con mayor densidad sigue siendo la sorpresa, sieguida de la alegría, sin embargo, la emoción que tiene publicación con mayor número de retuiteos, es la confianza.
+En el caso de las interacciones de los usuarios retuiteando publicaciones, la emoción con mayor densidad sigue siendo la sorpresa, seguida de la alegría, sin embargo, la emoción que tiene publicación con mayor número de retuiteos, es la confianza.
 
 ```{r rtviolin, echo=FALSE}
 tidy_presirvienta %>% 
@@ -494,91 +446,6 @@ tidy_presirvienta %>%
 ```
 
 En el caso de los tuits que fueron respodidos por otros usuarios, la densidad esta alrededor de las 100 respuestas, la tendencia hacia el mayor número mantiene estabilidad hacia el 1,000, reduciendose a partir de esa cantidad de respuestas.
-
-### Citaciones
-
-```{r citaciones, echo=FALSE}
-
-tidy_presirvienta %>% 
-  filter(quote_count < 100) %>% 
-  ggplot(aes( x= Emotion, y= quote_count, color = Emotion )) +
-    geom_jitter(width = .3, alpha = .5) +
-    labs(x = "Emoción", y = "Número de Citación",
-         title = 'Número de Citación por Emoción',
-         subtitle = 'Citación menores a 100',
-         caption = 'Se filtraron para mejorar la visualización'
-         ) +
-    coord_flip() +
-    theme_ft_rc() +
-    scale_color_ucscgb()+
-    theme(legend.position = "none")
-
-
-```
-
-En cuanto a los tuits que fueron citados, la densidad está en las emociones: sopresa y alegría, sin embargo, los tuits con mayor número de citaciones son los tuis que expresan sorpresa y tristeza.
-
-```{r quoteviolin, echo=FALSE}
-tidy_presirvienta %>% 
-  filter(quote_count > 50) %>% 
-  ggplot(aes(x = 1, y = quote_count)) +
-    geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
-    labs(x = NULL,
-         y = "Número de Citas",
-         title = 'Gráfico de violín de Citas',
-         subtitle = 'Citas mayores a 50'
-    ) +
-    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
-    coord_flip() +
-    theme_ft_rc()
-```
-
-Tomando todo el número de tuits que fueron citados, la densidad se sitúa alrededor de los 80 citaciones, la distribución hacia el mayor número de citas se va reduciendo sin embargo aumenta un poco la densidad pasando las 250 citaciones.
-
-### Impresiones
-
-```{r impresiones, echo=FALSE}
-
-library(scales)
-
-tidy_presirvienta %>% 
-  # Filtrar valores no finitos
-  filter(is.finite(impression_count)) %>%
-  filter(impression_count<100000) %>% 
-  ggplot(aes(x = Emotion, y = impression_count, color = Emotion)) +
-    geom_jitter(width = .3, alpha = .5) +
-    labs(x = "Emoción", y = "Número de Impresiones",
-         title = 'Número de Impresiones por Emoción',
-         subtitle = 'Impresiones menores a 100,000',
-         caption = 'Se filtraron para mejorar la visualización'
-         ) +
-    coord_flip() +
-    theme_ft_rc() +
-    scale_color_ucscgb()+
-    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
-    theme(legend.position = "none")
-
-
-```
-
-Las emociones con mayor densidad en el caso de los tuits con mayores impresiones, se sitúan en las emociones sorpresa y alegría, de igual modo, las emociones con tuits con mayor número de impresiones, son la alegría y la sorpresa.
-
-```{r violin_impresion, echo=FALSE}
-tidy_presirvienta %>% 
-  filter(impression_count > 10000) %>% 
-  ggplot(aes(x = 1, y = impression_count)) +
-    geom_violin(color = ft_cols$slate, fill = ft_cols$red) +
-    labs(x = NULL,
-         y = "Número de Impresiones",
-         title = 'Gráfico de violín de Impresiones',
-         subtitle = 'Citas mayores a 10,000'
-    ) +
-    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
-    coord_flip() +
-    theme_ft_rc()
-```
-
-En el caso de los tuits que recibieron impresiones, la densidad está en los tuis que tuvieron alrededor de 50,000 impresiones, la tendencia se reduce drasticamente, aumentando un poco pasando los 150,000. Se reduce entre los 250,000 y 400,000, aumentando un poco a partir de esta cifra.
 
 ### Plots sobre interacciones
 
@@ -671,7 +538,6 @@ tidy_presirvienta %>%
 
 En la gráfica anterior se puede observar que el número de likes relacionado con la valoración de los sentimientos, los tuits con mayor densidad son aquellos que están en los valores neutrales, sin embargo tanto en los tuits que son respuesta y los que no son, la gráfica tienen una tendencia hacia los valores negativos, por tanto, existe mayor densidad hacia los valores negativos.
 
-
 ## Exploración sobre los textos de las publicaciones
 
 ```{r librerias2, include=FALSE}
@@ -681,6 +547,7 @@ library(tm)
 library(wordcloud2)
 
 ```
+
 ```{r dataframe, include=FALSE, echo=FALSE}
 tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 # Se escogen solo las columnas que van a servirnos
@@ -702,6 +569,7 @@ tidy_presirvienta1 <- tidy_presirvienta1 %>%
   filter(timestamp >= start_date & timestamp <= end_date)
 
 ```
+
 ```{r limpieza, include=FALSE, echo=FALSE}
 
 limp_presirvienta <- tidy_presirvienta1 %>%
@@ -712,9 +580,11 @@ limp_presirvienta <- tidy_presirvienta1 %>%
   anti_join(tibble(word = tm::stopwords("es")))
   
 ```
+
 A continuación se presenta el trabajo de análisis de la columna del contenido textual de la base de datos, se presentan diferentes gráficos para entender mejor el contenido de los tuits de la base de datos.
 
 ### Bigramas
+
 ```{r bigramas, include=FALSE, echo=FALSE}
 
 bigram_presirvienta <- tidy_presirvienta1 %>%
@@ -728,6 +598,7 @@ bigram_presirvienta <- tidy_presirvienta1 %>%
   unite(bigram, word1, word2, sep = " ")
 
 ```
+
 ```{r conteosbigramas, include=FALSE, echo=FALSE}
 #conteo de ocurrencias por palabras gral.
 conteobigramas_presirvienta <- bigram_presirvienta %>% 
@@ -750,8 +621,9 @@ bigramemocion_presirvienta <- bigram_presirvienta %>%
   filter(!bigram == 'NA NA') %>% 
   filter(!bigram == 'presirvienta presirvienta')
 ```
-El primer trabajo de análisis es contabilizar lo que se ha denominado bigramas, se contabiliza la combinación de 2 palabras que más se repiten, con esto se busca entender qué palabras son las más usadas, pero también combinación con otra palabras para lograr tener un mejor contexto del uso de las palabras y lograr extraer significados.
-### Gráficas de los bigramas
+
+El primer trabajo de análisis es contabilizar lo que se ha denominado bigramas, se contabiliza la combinación de 2 palabras que más se repiten, con esto se busca entender qué palabras son las más usadas, pero también combinación con otra palabras para lograr tener un mejor contexto del uso de las palabras y lograr extraer significados. \### Gráficas de los bigramas
+
 ```{r graficas_bigramas, echo=FALSE}
 
 conteobigramas_presirvienta %>% 
@@ -764,6 +636,7 @@ conteobigramas_presirvienta %>%
   theme(legend.position = "none")+
   theme_ft_rc()
 ```
+
 En este gráfico es posible observar que los bigramas más empleados son, en primer lugar, el nombre de la presidenta: Claudia Sheinbaum. Sin embargo en segundo lugar se emplea presirvienta espuria y en tercer lugar, digan presirvienta. Es importante señalar que aparece el nombre del cómico mexicano: Rafael Inclan en cuarto lugar.
 
 Grafica por día
@@ -780,6 +653,7 @@ bigramdia_presirvienta %>%
   theme(legend.position = "none", date_labels = "%d/%m/%Y")+
   theme_ft_rc() 
 ```
+
 Los bigramas acomodados por día sus frecuencias, es posible observar que el día 2 de Octubre se repiten bigramas con adjetivos calificativos hacia la presidenta, en los otros días, exceptuando el 7, la combinación dígan presirvienta aparece con mayor frecuencia.
 
 Gráfica por emocion
@@ -799,12 +673,15 @@ bigramemocion_presirvienta%>%
 
 
 ```
+
 En este conjunto de gráficos es posible observar que la emoción con mayor densidad de bigramas es tristeza y en segundo lugar es sorpresa. De ggual manera aparece el nombre de la presidenta como bigrama con más ocurrencias.
+
 ```{r librerías, include=FALSE}
 library(topicmodels)
 library(tm)
 library(SnowballC)
 ```
+
 ## Modelado de tópicos #Presirvienta
 
 El modelado de tópicos es un proceso que permite identificar patrones de tópicos en un conjunto de textos, en esta ocasión se realizó este modelado a partir del contenido de los tuits recopilados en la búsqueda con el termino "Presirvienta"
@@ -816,6 +693,7 @@ tidy_presirvienta1 <- read.csv('data/tidy_presirvienta.csv')
 tidy_presirvienta1 <- tidy_presirvienta1 %>% 
   select(id, timestamp, author, body, Emotion)
 ```
+
 ```{r limpieza2, include=FALSE, echo=FALSE}
 document <- Corpus(VectorSource(tidy_presirvienta1$body))
 # limpieza del texto
@@ -838,6 +716,7 @@ removeEmojis <- function(x) {
 document <- tm_map(document, content_transformer(removeURLs))
 document <- tm_map(document, content_transformer(removeEmojis))
 ```
+
 ```{r preparación, include=FALSE, echo=FALSE}
 # Crear la Document-Term Matrix
 dtm <- DocumentTermMatrix(document)
@@ -863,6 +742,7 @@ terms(lda_model, 10)  # 10 términos principales por tópico
 # Ver la distribución de tópicos en los documentos
 topics(lda_model)
 ```
+
 ```{r extraer, echo=FALSE}
 # Extraer los términos principales de cada tópico junto con sus valores beta
 top_terms <- terms(lda_model, 10)
@@ -895,11 +775,11 @@ ggplot(top_terms_df, aes(x = reorder(term, -beta), y = beta, fill = factor(topic
 
 ```
 
-En estos gráficos se infiere que el primer núcleo de significados hace referencia a la presidenta y cómo la nombran "presirvienta", además la palabra "amo" aparece completando el significado del tópico, indicando servilismo por parte de la Presidenta. 
+En estos gráficos se infiere que el primer núcleo de significados hace referencia a la presidenta y cómo la nombran "presirvienta", además la palabra "amo" aparece completando el significado del tópico, indicando servilismo por parte de la Presidenta.
 
-En el segundo núcleo aparece el nombre de Rafael Inclán y la palabra ama de casa, haciendo referencia a las declaraciones del cómico. En el tercer núcleo, al igual que el quinto, harían referencia a la idea que el sexenio de la Presidenta sería igual al sexenio pasado, una "calca" del anterior. 
+En el segundo núcleo aparece el nombre de Rafael Inclán y la palabra ama de casa, haciendo referencia a las declaraciones del cómico. En el tercer núcleo, al igual que el quinto, harían referencia a la idea que el sexenio de la Presidenta sería igual al sexenio pasado, una "calca" del anterior.
 
-En el cuarto núcleo se ubican aquellos contenidos que hablarían de una crítica hacia el expresidente y hacia la Presidenta, sin embargo aparece también el adjetivo "chairos"  ubicandolo en torno a está crítica.
+En el cuarto núcleo se ubican aquellos contenidos que hablarían de una crítica hacia el expresidente y hacia la Presidenta, sin embargo aparece también el adjetivo "chairos" ubicandolo en torno a está crítica.
 
 En el sexto y séptimo núcleos, aparece el adjetivo "espúria" también hace referencia a la acción de la Presidenta de besar la mano de el político Manuel Velazco. En el caso de los núcleos 8, 9 y 10 no se puede apreciar un significado relevante.
 
