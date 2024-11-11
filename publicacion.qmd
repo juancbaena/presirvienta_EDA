@@ -23,6 +23,14 @@ Candidato a doctor en Humanidades, miembro fundador del Colectivo de Investigaci
 
 ## Introducción
 
+Los primeros días de la presidencia de Claudia Sheinbaum han estado marcados por expresiones de discriminación y misoginia en redes sociales. Destaca el uso del término despectivo "Presirvienta", una expresión que combina misoginia y clasismo al intentar descalificar a la mandataria. Esta narrativa discriminatoria tuvo un momento importante en junio de 2024, cuando el actor Rafael Inclán declaró: "Ahora vamos a tener una ama de casa seis años".[^1] Ante estos señalamientos, Claudia Sheinbaum respondió el 3 de octubre enfatizando que el término "sirvienta" es misógino y defendió un principio fundamental: la dignidad inherente a todo trabajo.[^2]
+
+[^1]: <https://lacaderadeeva.com/voces/misoginia-politica-ataques-a-sheinbaum-en-sus-primeros-dias/11509>
+
+[^2]: <https://es-us.vida-estilo.yahoo.com/critican-actor-comentario-mis%C3%B3gino-sheinbaum-093226184.html>
+
+Para entender el discurso e impacto de las publicaciones que nombran a la presidenta de manera despectiva, a continuación se presenta un análisis exploratorio de los datos obtenidos sobre los tuits que incluyeran la palabra "Presirvienta", entre el 1 de octubre del 2024 y el 8 del mismo mes. Se presentan algunas gráficas y la interpretación de las mismas buscando analizar los contenidos y los comportamientos de publicación.
+
 ## Metodología
 
 ```{r factores, include=FALSE}
@@ -62,9 +70,9 @@ La metodología que se siguió para esta investigación consistió en:
 
 ![](https://es.r4ds.hadley.nz/diagrams_w_text_as_path/es/data-science.svg)
 
-La exploración, la visualización, y la interpretación de los hallazgos de esta base de datos[^1], realizados todos empleando el lenguaje de programación R, se presentan a continuación:
+La exploración, la visualización, y la interpretación de los hallazgos de esta base de datos[^3], realizados todos empleando el lenguaje de programación R, se presentan a continuación:
 
-[^1]: Los datos y la programación empleada, se encuentra en el repositorio: <https://github.com/juancbaena/presirvienta_EDA>
+[^3]: Los datos y la programación empleada, se encuentra en el repositorio: <https://github.com/juancbaena/presirvienta_EDA>
 
 ## Visualizaciones
 
