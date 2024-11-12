@@ -7,7 +7,6 @@ output:
     fig_caption: true
 toc: true
 ---
-
 ```{r librerias1, include=FALSE}
 library(tidyverse)
 library(lubridate)
