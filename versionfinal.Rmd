@@ -558,3 +558,34 @@ En el cuarto núcleo se ubican aquellos contenidos que hablarían de una crític
 En el sexto y séptimo núcleos, aparece el adjetivo "espúria" también hace referencia a la acción de la Presidenta de besar la mano de el político Manuel Velazco. En el caso de los núcleos 8, 9 y 10 no se puede apreciar un significado relevante.
 
 ## Conclusiones
+El análisis exploratorio de datos realizado sobre las publicaciones que contienen el término "Presirvienta" en la red social "X", durante la primera semana de la presidencia de Claudia Sheinbaum, revela patrones significativos tanto en el comportamiento de los usuarios como en el contenido de sus mensajes.
+
+## Hallazgos Principales
+
+1. Métricas de comportamiento:
+  - El día con más publicaciones fue el 3 de octubre
+  - Del total de publicaciones (628), el 38% son respuestas a otros tuits, mientras que el 62% son publicaciones originales
+  - Se observó una relación no lineal entre likes, retuits y respuestas: en valores bajos el crecimiento es proporcional, pero esta proporcionalidad se pierde en valores más altos
+2. Análisis de Contenido:
+  - Las cuentas más mencionadas fueron @Claudiashein y @Melissa_Bely
+  - Los bigramas más frecuentes identificados fueron "Claudia Sheinbaum", "presirvienta espuria" y "digan presirvienta", seguidos por menciones a Rafael Inclán
+3. Análisis de Sentimientos y Tópicos:
+  - El análisis de sentimientos reveló una predominancia de expresiones negativas
+  - Se identificaron cinco núcleos temáticos principales:
+    - Primer tópico: Referencias al supuesto servilismo de la presidenta
+    - Segundo tópico: Declaraciones de Rafael Inclán
+    - Tercer y quinto tópico: Esta administración será una copia a la anterior
+    - Cuarto tópico: Críticas despectivas hacia la presidenta
+    - Último tópico: Cuestionamientos sobre legitimidad y críticas a gestos específicos (besar la mano de un político)
+
+Los hallazgos sugieren que las reacciones negativas hacia la presidenta Sheinbaum están fuertemente mediadas por sesgos de género y clase social. El uso del término "Presirvienta" opera en dos niveles discriminatorios: primero, como una expresión de misoginia al cuestionar la capacidad de liderazgo por razón de género; segundo, como manifestación de clasismo al pretender utilizar las labores domésticas como forma de descalificación.
+
+La respuesta de la presidenta, enfatizando la dignidad de todos los trabajos, pone en evidencia una problemática más amplia: la persistencia en México de estructuras sociales que discriminan tanto por género como por condición socioeconómica.
+
+Es importante reconocer las limitaciones metodológicas de este estudio:
+
+- El análisis se centró en patrones generales sin profundizar en el contenido específico de cada publicación
+- Los métodos empleados revelan tendencias en el uso de palabras pero no capturan completamente los significados subyacentes
+- El período de análisis fue relativamente corto
+
+El monitoreo y análisis de los discursos en redes sociales se presenta como una tarea cada vez más urgente, especialmente ante la creciente agresividad en los espacios digitales. Si bien el debate público es fundamental para la democracia, es igualmente importante identificar y señalar cuando los discursos perpetúan discriminaciones históricas. Esto es especialmente relevante cuando afectan a grupos que han enfrentado marginación sistemática.
